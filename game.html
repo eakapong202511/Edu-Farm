@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EduFarm — หน้าฟาร์มหลัก ปลูกพืช เก็บเกี่ยว ในฟาร์มแห่งการเรียนรู้">
+  <title>🌾 EduFarm — ฟาร์มของฉัน</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/farm.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* === Quiz Modal Styles (Compact Single-Page Layout) === */
+    #quizModal .modal-content {
+      padding: var(--spacing-md);
+      max-width: 440px;
+    }
+    .quiz-question {
+      background: linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%);
+      border: 3px solid #FFB300;
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-sm);
+      text-align: center;
+    }
+    .quiz-question-text {
+      font-size: var(--font-size-lg);
+      font-weight: 800;
+      color: var(--color-brown-dark);
+      line-height: 1.4;
+    }
+    .quiz-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-sm);
+    }
+    .quiz-choice-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--color-white);
+      border: 2.5px solid #E0E0E0;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--font-family);
+    }
+    .quiz-choice-btn:hover {
+      border-color: var(--color-sky-dark);
+      background: #E3F2FD;
+      transform: scale(1.02);
+    }
+    .quiz-choice-btn:active { transform: scale(0.97); }
+    .quiz-choice-label {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #42A5F5, #1976D2);
+      color: white; border-radius: var(--radius-full);
+      font-weight: 800; font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .quiz-choice-text { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .quiz-choice-correct {
+      border-color: #43A047 !important;
+      background: #E8F5E9 !important;
+      animation: pulse 0.5s ease;
+    }
+    .quiz-choice-correct .quiz-choice-label {
+      background: linear-gradient(135deg, #66BB6A, #2E7D32) !important;
+    }
+    .quiz-choice-wrong {
+      border-color: #E53935 !important;
+      background: #FFEBEE !important;
+      animation: wiggle 0.5s ease;
+    }
+    .quiz-choice-wrong .quiz-choice-label {
+      background: linear-gradient(135deg, #EF5350, #C62828) !important;
+    }
+    .quiz-choice-disabled { opacity: 0.4; }
+    .quiz-hint-section {
+      text-align: center;
+      margin-bottom: var(--spacing-xs);
+    }
+    .quiz-hint-text {
+      margin-top: 4px;
+      padding: 4px 8px;
+      background: #FFF3E0;
+      border-radius: var(--radius-sm);
+      color: #E65100;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .quiz-result {
+      text-align: center;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-md);
+      background: #F5F5F5;
+      margin-top: var(--spacing-xs);
+    }
+    .quiz-result-icon { font-size: 1.5rem; display: inline-block; margin-right: 4px; }
+    .quiz-result-text {
+      font-size: 1rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .quiz-result-explain {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 480px) {
+      .quiz-choices {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-page">
+    <!-- === เมฆลอยตกแต่ง === -->
+    <span class="cloud cloud-1">☁️</span>
+    <span class="cloud cloud-2">⛅</span>
+    <span class="cloud cloud-3">☁️</span>
+
+    <!-- =========================================
+         🎯 HUD — แถบข้อมูลด้านบน
+         ========================================= -->
+    <header class="hud-bar" id="hudBar">
+      <div class="hud-player">
+        <div class="hud-avatar">🧒</div>
+        <span class="hud-name" id="hudName">เกษตรกร</span>
+      </div>
+      <div class="hud-stats">
+        <div class="hud-stat hud-coins" id="hudCoins">
+          <span>💰</span>
+          <span id="coinsValue">100</span>
+        </div>
+        <div class="hud-stat hud-exp" id="hudExp">
+          <span>⭐</span>
+          <span id="expValue">0</span>
+        </div>
+        <div class="hud-stat hud-level" id="hudLevel">
+          <span>🏅</span>
+          <span>Lv.<span id="levelValue">1</span></span>
+        </div>
+        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="ShopManager.openInventoryModal()">
+          📦 คลัง
+        </button>
+        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="ShopManager.openOrderBoardModal()">
+          🚚 ออเดอร์
+        </button>
+        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="QuestManager.openQuestModal()">
+          📋 ภารกิจ
+        </button>
+        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="BankManager.openBankModal()">
+          🏦 ธนาคาร
+        </button>
+        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="DecorationManager.openDecorationModal()">
+          🎨 ของแต่ง
+        </button>
+        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #7B1FA2, #512DA8); color: white;" onclick="EncyclopediaManager.openBookModal()">
+          📖 สารานุกรม
+        </button>
+        <button class="btn btn-sm btn-secondary" id="btnFullscreen" style="padding: 4px 10px; font-size: 0.8rem; background: #00838F; color: white;" onclick="toggleFullscreen()">
+          🖥️ เล่นเต็มจอ
+        </button>
+        <button class="btn btn-sm btn-secondary" id="btnToggleBGM" style="padding: 4px 10px; font-size: 0.8rem;" onclick="AudioManager.toggleBGM()">
+          🔇 เพลง: ปิด
+        </button>
+        <!-- ปุ่มปรับระดับเสียงเพลง BGM -->
+        <div style="display: inline-flex; align-items: center; background: rgba(0, 0, 0, 0.25); border-radius: 20px; padding: 2px 6px; gap: 4px;" title="ปรับระดับเสียงเพลง">
+          <button class="btn btn-sm" style="padding: 0; font-size: 0.75rem; background: #FF7043; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;" onclick="AudioManager.decreaseBGMVolume()" title="ลดเสียงเพลง">
+            ➖
+          </button>
+          <span id="bgmVolumeText" style="font-size: 0.75rem; font-weight: 800; color: #FFF; min-width: 32px; text-align: center;">50%</span>
+          <button class="btn btn-sm" style="padding: 0; font-size: 0.75rem; background: #66BB6A; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;" onclick="AudioManager.increaseBGMVolume()" title="เพิ่มเสียงเพลง">
+            ➕
+          </button>
+        </div>
+        <button class="btn btn-sm btn-secondary" id="btnToggleSFX" style="padding: 4px 10px; font-size: 0.8rem;" onclick="AudioManager.toggleSFX()">
+          🔊 เสียง: เปิด
+        </button>
+      </div>
+    </header>
+
+    <!-- =========================================
+         🌾 FARM MAIN LAYOUT — ตัวละครซ้าย + ฟาร์มขวา
+         ========================================= -->
+    <main class="farm-main-layout">
+      <!-- 🧑‍🌾 ซ้ายมือ: โมเดลตัวละคร 3D สวมใส่ชุด -->
+      <aside class="avatar-panel" id="leftAvatarPanel">
+        <!-- สร้างโดย avatar.js -->
+      </aside>
+
+      <!-- 🌾 ขวามือ: พื้นที่ฟาร์ม 2.5D Landscape -->
+      <div class="farm-container">
+        <div class="farm-field">
+          <!-- ของแต่งรอบฟาร์ม -->
+          <div id="farmDecoBar" style="text-align: center; margin-bottom: 4px;">
+            🌻 🌷 🌼 🌸 🌻 🌷 🌼 🌸
+          </div>
+          
+          <!-- View หลัก: ฝั่งซ้าย (แปลงปลูกผัก 3x3 Grid) & ฝั่งขวา (คอกสัตว์เลี้ยง 3D Grid) -->
+          <div class="farm-dual-columns" id="viewMainFarm">
+            <!-- ฝั่งซ้าย: แปลงปลูกผัก 3x3 Grid -->
+            <div id="viewCrops">
+              <div class="farm-grid" id="farmGrid">
+                <!-- แปลงปลูก 9 ช่อง — สร้างโดย JavaScript -->
+              </div>
+            </div>
+
+            <!-- ฝั่งขวา: คอกสัตว์ Grid 3D -->
+            <div id="viewAnimals">
+              <div class="farm-grid" id="animalGrid">
+                <!-- คอกสัตว์ — สร้างโดย animals.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- View 3: โรงงานแปรรูป -->
+          <div id="viewFactories" class="hidden">
+            <h2 class="farm-title" style="margin-bottom: 4px;">🏭 โรงงานแปรรูปผลผลิต</h2>
+            <div id="factoryList">
+              <!-- รายการโรงงาน — สร้างโดย factory.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =========================================
+         📱 TOOLBAR — แถบเครื่องมือด้านล่าง
+         ========================================= -->
+    <nav class="toolbar" id="toolbar">
+      <button class="toolbar-btn active" onclick="switchFarmTab('crops')">
+        <span class="toolbar-icon">🌾</span>
+        <span class="toolbar-label">ทำฟาร์ม</span>
+      </button>
+      <button class="toolbar-btn" onclick="ShopManager.openInventoryModal()">
+        <span class="toolbar-icon">📦</span>
+        <span class="toolbar-label">คลังสินค้า</span>
+      </button>
+      <button class="toolbar-btn" onclick="ShopManager.openOrderBoardModal()">
+        <span class="toolbar-icon">🚚</span>
+        <span class="toolbar-label">ออเดอร์</span>
+      </button>
+      <button class="toolbar-btn" onclick="ShopManager.openShopModal()">
+        <span class="toolbar-icon">🏪</span>
+        <span class="toolbar-label">ร้านค้า</span>
+      </button>
+      <button class="toolbar-btn" onclick="if(confirm('กลับหน้าแรก?')){window.location.href='index.html';}">
+        <span class="toolbar-icon">🏠</span>
+        <span class="toolbar-label">หน้าแรก</span>
+      </button>
+    </nav>
+
+    <!-- =========================================
+         🌱 MODAL: เลือกเมล็ดพันธุ์
+         ========================================= -->
+    <div class="modal-overlay" id="seedModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('seedModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">🌱 เลือกเมล็ดพันธุ์</h3>
+        </div>
+        <div class="modal-body">
+          <div class="seed-grid" id="seedGrid">
+            <!-- สร้างโดย JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         📦 MODAL: คลังสินค้า (Barn Inventory)
+         ========================================= -->
+    <div class="modal-overlay" id="inventoryModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('inventoryModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">📦 คลังสินค้าของฉัน</h3>
+        </div>
+        <div class="modal-body">
+          <div class="seed-grid" id="inventoryGrid">
+            <!-- สร้างโดย shop.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🚚 MODAL: กระดานออเดอร์ (Order Board)
+         ========================================= -->
+    <div class="modal-overlay" id="orderModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('orderModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">🚚 กระดานคำสั่งซื้อ NPC</h3>
+        </div>
+        <div class="modal-body">
+          <div id="orderGrid">
+            <!-- สร้างโดย shop.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         📋 MODAL: ภารกิจ (Quest Modal)
+         ========================================= -->
+    <div class="modal-overlay" id="questModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('questModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">📋 ภารกิจการเรียนรู้ประจำวัน</h3>
+        </div>
+        <div class="modal-body">
+          <div id="questList">
+            <!-- สร้างโดย quest.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🏦 MODAL: ธนาคารออมสิน (Bank Modal)
+         ========================================= -->
+    <div class="modal-overlay" id="bankModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('bankModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">🏦 ธนาคารออมสินฟาร์ม</h3>
+        </div>
+        <div class="modal-body">
+          <div id="bankContainer">
+            <!-- สร้างโดย bank.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🎨 MODAL: ของแต่งฟาร์ม (Decoration Modal)
+         ========================================= -->
+    <div class="modal-overlay" id="decoModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('decoModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">🎨 ร้านค้าของแต่งฟาร์มสไตล์ Hay Day</h3>
+        </div>
+        <div class="modal-body">
+          <div id="decoTabContainer"></div>
+          <div class="seed-grid" id="decoGrid">
+            <!-- สร้างโดย decoration.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🏪 MODAL: ร้านค้า (Shop Modal)
+         ========================================= -->
+    <div class="modal-overlay" id="shopModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('shopModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">🏪 ร้านค้าชุมชน</h3>
+        </div>
+        <div class="modal-body">
+          <div class="seed-grid" id="shopGrid">
+            <!-- สร้างโดย shop.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🎉 MODAL: ผลลัพธ์การเก็บเกี่ยว
+         ========================================= -->
+    <div class="modal-overlay" id="resultModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="resultTitle">🎉 เก็บเกี่ยวสำเร็จ!</h3>
+        </div>
+        <div class="modal-body">
+          <div class="result-emoji" id="resultEmoji">🌾</div>
+          <p class="result-message" id="resultMessage">เก็บข้าวได้แล้ว!</p>
+          <div class="result-rewards">
+            <div class="result-reward-item reward-coin">
+              <span>💰</span>
+              <span id="resultCoins">+10</span>
+            </div>
+            <div class="result-reward-item reward-exp">
+              <span>⭐</span>
+              <span id="resultExp">+5</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="resultOkBtn">เยี่ยมไปเลย! 👍</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         ❓ MODAL: คำถาม Quiz
+         ========================================= -->
+    <div class="modal-overlay" id="quizModal">
+      <div class="modal-content">
+        <!-- เนื้อหาจะถูกสร้างโดย quiz.js -->
+      </div>
+    </div>
+
+    <!-- =========================================
+         👔 MODAL: ตู้เสื้อผ้า & ร้านแต่งตัว (Wardrobe Modal)
+         ========================================= -->
+    <div class="modal-overlay" id="wardrobeModal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="ModalSystem.close('wardrobeModal')">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title">👔 ตู้เสื้อผ้า & แต่งตัวเจ้าของฟาร์ม</h3>
+        </div>
+        <div class="modal-body">
+          <div id="wardrobeTabContainer"></div>
+          <div class="seed-grid" id="wardrobeGrid">
+            <!-- สร้างโดย avatar.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📖 MODAL สารานุกรมฟาร์มแห่งการเรียนรู้ -->
+    <div class="modal-overlay" id="encyclopediaModal">
+      <div class="modal-content" style="max-width: 580px; border: 4px solid #7B1FA2; background: #FFF8E1;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #7B1FA2, #512DA8); padding: 12px 16px;">
+          <h3 class="modal-title" style="color: white; font-size: 1.15rem;">📖 สารานุกรมฟาร์มแห่งการเรียนรู้</h3>
+          <button class="modal-close" style="color: white;" onclick="ModalSystem.close('encyclopediaModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 12px;">
+          <div id="encyclopediaTabs"></div>
+          <div id="encyclopediaBody" style="max-height: calc(100vh - 220px); overflow-y: auto; padding-right: 4px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================
+         🔔 TOAST CONTAINER
+         ========================================= -->
+    <div class="toast-container" id="toastContainer"></div>
+
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/animals.js"></script>
+  <script src="js/factory.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/quest.js"></script>
+  <script src="js/bank.js"></script>
+  <script src="js/decoration.js"></script>
+  <script src="js/encyclopedia.js"></script>
+  <script src="js/farm.js"></script>
+  <script>
+    // สลับแท็บพื้นที่หน้าฟาร์ม
+    function switchFarmTab(tabName) {
+      const mainFarm = document.getElementById('viewMainFarm');
+      const factories = document.getElementById('viewFactories');
+
+      if (mainFarm) mainFarm.classList.add('hidden');
+      if (factories) factories.classList.add('hidden');
+
+      document.getElementById('tabCrops').className = 'btn btn-sm btn-secondary tab-btn';
+      document.getElementById('tabAnimals').className = 'btn btn-sm btn-secondary tab-btn';
+      document.getElementById('tabFactories').className = 'btn btn-sm btn-secondary tab-btn';
+
+      if (tabName === 'crops' || tabName === 'animals') {
+        if (mainFarm) mainFarm.classList.remove('hidden');
+        const activeTabId = tabName === 'crops' ? 'tabCrops' : 'tabAnimals';
+        document.getElementById(activeTabId).className = 'btn btn-sm btn-warning tab-btn active';
+        if (typeof AudioManager !== 'undefined') AudioManager.playFarmMenuSound();
+        if (typeof AnimalManager !== 'undefined') AnimalManager.renderAnimalPen();
+      } else if (tabName === 'factories') {
+        if (factories) factories.classList.remove('hidden');
+        document.getElementById('tabFactories').className = 'btn btn-sm btn-warning tab-btn active';
+        if (typeof AudioManager !== 'undefined') AudioManager.playClick();
+        if (typeof FactoryManager !== 'undefined') FactoryManager.renderFactories();
+      }
+    }
+
+    // เรียกการันตีการโหลด UI, 3D Animals และ 3D Avatar
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (typeof AnimalManager !== 'undefined') {
+          AnimalManager.renderAnimalPen();
+        }
+      }, 300);
+    });
+
+    if (typeof runInitFarm === 'function') {
+      runInitFarm();
+    }
+  </script>
+</body>
+</html>
