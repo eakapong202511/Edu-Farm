@@ -1203,3 +1203,349 @@ html, body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* =========================================
+   🌤️ WEATHER SYSTEM & 🎡 LUCKY WHEEL STYLES
+   ========================================= */
+.hud-weather {
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.weather-sunny {
+  background: linear-gradient(135deg, #FFB300 0%, #F57F17 100%);
+  color: #FFF;
+}
+
+.weather-rainy {
+  background: linear-gradient(135deg, #0288D1 0%, #01579B 100%);
+  color: #FFF;
+  animation: pulse 1.5s infinite;
+}
+
+.weather-rainbow {
+  background: linear-gradient(135deg, #E91E63 0%, #9C27B0 33%, #2196F3 66%, #4CAF50 100%);
+  color: #FFF;
+  animation: shimmer 1s ease-in-out infinite;
+}
+
+/* Rain Effect Overlay */
+.rain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -20px;
+  width: 2px;
+  height: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(129,212,250,0.9));
+  animation: rainFall 0.8s linear infinite;
+}
+
+@keyframes rainFall {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.8; }
+  100% { transform: translateY(105vh) scaleY(1.2); opacity: 0.2; }
+}
+
+/* Rainbow Effect Overlay */
+.rainbow-overlay {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90vw;
+  height: 300px;
+  pointer-events: none;
+  z-index: 998;
+  overflow: hidden;
+}
+
+.rainbow-arc {
+  width: 100%;
+  height: 100%;
+  border-radius: 500px 500px 0 0;
+  border: 14px solid transparent;
+  border-top-color: rgba(244, 67, 54, 0.55);
+  border-right-color: rgba(255, 152, 0, 0.55);
+  border-left-color: rgba(76, 175, 80, 0.55);
+  box-shadow: 
+    0 -10px 30px rgba(33, 150, 243, 0.4),
+    inset 0 10px 30px rgba(156, 39, 176, 0.4);
+  filter: blur(2px);
+  animation: rainbowShimmer 3s ease-in-out infinite alternate;
+}
+
+@keyframes rainbowShimmer {
+  0% { opacity: 0.6; filter: blur(2px) drop-shadow(0 0 10px #FFD54F); }
+  100% { opacity: 0.9; filter: blur(1px) drop-shadow(0 0 25px #FF4081); }
+}
+
+/* 🎡 3D LUCKY WHEEL STYLES */
+.lucky-wheel-circle {
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  border: 8px solid #FFB300;
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.4),
+    inset 0 0 15px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+  background: conic-gradient(
+    #FFD54F 0deg 60deg,
+    #81C784 60deg 120deg,
+    #FFB74D 120deg 180deg,
+    #4FC3F7 180deg 240deg,
+    #BA68C8 240deg 300deg,
+    #FF8A65 300deg 360deg
+  );
+}
+
+.wheel-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 0;
+  right: 0;
+  transform-origin: 0% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #FFF;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+.seg-0 { transform: rotate(30deg) translate(-10px, 20px); }
+.seg-1 { transform: rotate(90deg) translate(-10px, 20px); }
+.seg-2 { transform: rotate(150deg) translate(-10px, 20px); }
+.seg-3 { transform: rotate(210deg) translate(-10px, 20px); }
+.seg-4 { transform: rotate(270deg) translate(-10px, 20px); }
+.seg-5 { transform: rotate(330deg) translate(-10px, 20px); }
+
+.wheel-center-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #FFFDF5, #FFE082);
+  border: 4.5px solid #FF8F00;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  z-index: 5;
+}
+
+/* =========================================
+   🐶 FARM HELPER PET STYLES
+   ========================================= */
+.farm-pet-container {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.farm-pet-sprite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: petWiggle 3s ease-in-out infinite;
+  pointer-events: auto;
+}
+
+@keyframes petWiggle {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.pet-speech-bubble {
+  background: #FFF;
+  color: #E65100;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 12px;
+  border: 1.5px solid #FFB300;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.pet-emoji-3d {
+  font-size: 3.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
+}
+
+.pet-level-badge {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1.5px solid #FFF;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* 🏃 ANIMAL RUNNING ANIMATION */
+.farm-pet-sprite.pet-running {
+  animation: petRun 0.22s linear infinite !important;
+}
+
+@keyframes petRun {
+  0% { transform: translateY(0) rotate(-7deg) scale(1.1); }
+  50% { transform: translateY(-9px) rotate(7deg) scale(1.1); }
+  100% { transform: translateY(0) rotate(-7deg) scale(1.1); }
+}
+
+/* =========================================
+   🐝 BEEHIVE & TROPHY BADGE STYLES
+   ========================================= */
+.beehive-container {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.beehive-sprite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  animation: petWiggle 3.2s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+
+.beehive-sprite:hover {
+  transform: scale(1.12);
+}
+
+.beehive-speech-bubble {
+  background: #FFFDF5;
+  color: #E65100;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1.5px solid #FFB300;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  margin-bottom: 2px;
+}
+
+.beehive-emoji-3d {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35));
+}
+
+.hive-ready .beehive-emoji-3d {
+  animation: pulse 1s infinite !important;
+}
+
+.beehive-badge {
+  background: linear-gradient(135deg, #FFB300, #F57C00);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 10px;
+  border: 1px solid #FFF;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  margin-top: 2px;
+}
+
+.avatar-trophy-bar {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.trophy-badge-display {
+  background: linear-gradient(135deg, #FFD54F, #FFB300);
+  color: #5D4037;
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 2px solid #FFF;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.2s ease;
+}
+
+.trophy-badge-display:hover {
+  transform: scale(1.06);
+}
+
+/* 🐝 FLYING BEE ANIMATION STYLES */
+.farm-flying-bee {
+  position: absolute;
+  top: 15px;
+  right: 80px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.flying-bee-bubble {
+  background: #FFFDF5;
+  color: #D84315;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 12px;
+  border: 1.5px solid #FFB300;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.flying-bee-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+  animation: beeBuzz 0.25s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+@keyframes beeBuzz {
+  0% { transform: translateY(0) rotate(-6deg); }
+  100% { transform: translateY(-5px) rotate(6deg); }
+}
+
+@keyframes pollenFloat {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
+  50% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -45px) scale(1); }
+}

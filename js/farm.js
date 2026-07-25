@@ -35,6 +35,10 @@ async function initFarm() {
     DecorationManager.renderFarmDecorations();
   }
 
+  if (typeof PetManager !== 'undefined') {
+    PetManager.init();
+  }
+
   setupToolbar();
   setupModals();
 
@@ -614,6 +618,9 @@ function setupModals() {
   // คลิกพื้นหลังเพื่อปิด
   ModalSystem.setupBackdropClose('seedModal');
   ModalSystem.setupBackdropClose('resultModal');
+  ModalSystem.setupBackdropClose('steamboatModal');
+  ModalSystem.setupBackdropClose('fishingModal');
+  ModalSystem.setupBackdropClose('achievementsModal');
 }
 
 // =============================================

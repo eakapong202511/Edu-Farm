@@ -134,27 +134,40 @@ async function loadQuestions() {
 
 let askedQuestionIds = [];
 
+function isGradeMatch(qGrade, playerGrade) {
+  if (!qGrade || qGrade === 'all') return true;
+  const g = parseInt(playerGrade) || 1;
+  if (qGrade === '1-3' && g <= 3) return true;
+  if (qGrade === '4-6' && g >= 4) return true;
+  if (qGrade === String(g)) return true;
+  return false;
+}
+
 /**
  * สุ่มเลือกคำถามตามเงื่อนไข (ไม่ซ้ำข้อเดิม)
  */
-function getRandomQuestion(subject = null, gradeGroup = null) {
+function getRandomQuestion(subject = null, playerGrade = null) {
   let pool = [...allQuestions];
 
-  // กรองคำถามที่ไม่เคยถามในรอบนี้เพื่อไม่ให้ซ้ำ
+  // 1. กรองตามวิชา (ถ้าระบุ)
+  if (subject) {
+    const subjectFiltered = pool.filter(q => q.subject === subject);
+    if (subjectFiltered.length > 0) pool = subjectFiltered;
+  }
+
+  // 2. กรองตามระดับชั้น (ถ้าระบุ)
+  if (playerGrade) {
+    const gradeFiltered = pool.filter(q => isGradeMatch(q.grade, playerGrade));
+    if (gradeFiltered.length > 0) pool = gradeFiltered;
+  }
+
+  // 3. กรองคำถามที่ไม่เคยถามในรอบนี้เพื่อไม่ให้ซ้ำ
   let unaskedPool = pool.filter(q => !askedQuestionIds.includes(q.id));
   if (unaskedPool.length === 0) {
-    askedQuestionIds = []; // รีเซ็ตประวัติถ้าถามครบทุกข้อแล้ว
+    askedQuestionIds = askedQuestionIds.filter(id => !pool.some(q => q.id === id));
     unaskedPool = [...pool];
   }
   pool = unaskedPool;
-
-  // กรองตามระดับชั้น
-  if (gradeGroup) {
-    const gradeFiltered = pool.filter(q => q.grade === gradeGroup);
-    if (gradeFiltered.length > 0) {
-      pool = gradeFiltered;
-    }
-  }
 
   if (pool.length === 0) pool = [...allQuestions];
   if (pool.length === 0) return null;
@@ -197,13 +210,13 @@ function getSubjectForActivity(activity) {
  */
 function showQuiz(activity, onComplete) {
   // กำหนดระดับชั้นจากข้อมูลผู้เล่น
-  const gradeGroup = gameState ? getGradeGroup(gameState.grade) : '1-3';
+  const playerGrade = gameState ? (gameState.grade || 1) : 1;
   
   // เลือกวิชาที่เหมาะกับกิจกรรม
   const subject = getSubjectForActivity(activity);
   
   // สุ่มคำถาม
-  const question = getRandomQuestion(subject, gradeGroup);
+  const question = getRandomQuestion(subject, playerGrade);
   
   if (!question) {
     // ไม่มีคำถาม → ให้ผ่านเลย

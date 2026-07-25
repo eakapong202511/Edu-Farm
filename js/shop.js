@@ -226,6 +226,35 @@ const ShopManager = {
   },
 
   /**
+   * ซื้อหมาน้อยช่วยฟาร์ม (ราคา 400 💰)
+   */
+  buyHelperPet() {
+    if (!gameState) return;
+    if (gameState.hasHelperPet) {
+      ToastSystem.show('🐶 คุณมีหมาน้อยผู้ช่วยฟาร์มอยู่แล้ว!', 'info');
+      return;
+    }
+    if (gameState.coins < 400) {
+      ToastSystem.show('⚠️ เหรียญทองไม่พอ! (ต้องการ 400 💰)', 'error');
+      return;
+    }
+
+    gameState.coins -= 400;
+    gameState.hasHelperPet = true;
+
+    if (typeof AudioManager !== 'undefined') AudioManager.playHarvestSound();
+    if (typeof renderHUD === 'function') renderHUD();
+    if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
+
+    if (typeof PetManager !== 'undefined') {
+      PetManager.init();
+    }
+
+    this.renderShopModal();
+    ToastSystem.show('🎉 ซื้อ 🐶 หมาน้อยช่วยฟาร์ม สำเร็จ! (ช่วยรดน้ำ 5s & เก็บผักอัตโนมัติ)', 'success');
+  },
+
+  /**
    * แสดงหน้าร้านค้า
    */
   renderShopModal() {
@@ -234,7 +263,36 @@ const ShopManager = {
 
     container.innerHTML = '';
 
-    // สัตว์เลี้ยงขายในร้าน
+    // 🐶 1. การ์ดสินค้า: หมาน้อยช่วยฟาร์ม (ราคา 400 💰)
+    const petCard = document.createElement('div');
+    petCard.style.cssText = 'background: #FFFDF5; border: 2.5px solid #FF9800; border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
+
+    const hasPet = gameState.hasHelperPet;
+    const canAffordPet = gameState.coins >= 400;
+
+    petCard.innerHTML = `
+      <div style="font-size: 2.5rem;">🐶</div>
+      <div style="font-weight: 900; color: #E65100; font-size: 1rem;">หมาน้อยผู้ช่วยฟาร์ม</div>
+      <div style="font-size: 0.78rem; color: #5D4037; margin-top: 4px; line-height: 1.3;">
+        💧 ช่วยรดน้ำแปลงผัก (คูลดาวน์ 10s)<br>🧺 ช่วยเก็บผลผลิตสุกแล้วทั้งหมด!
+      </div>
+      <div style="font-size: 0.9rem; color: #D84315; font-weight: 900; margin-top: 6px;">ราคา: 400 💰</div>
+      ${hasPet ? `
+        <div style="margin-top: 8px; font-size: 0.8rem; color: #2E7D32; font-weight: 900; background: #E8F5E9; padding: 6px; border-radius: 8px;">
+          ✅ มีผู้ช่วยในฟาร์มแล้ว!
+        </div>
+      ` : `
+        <button class="btn btn-sm ${canAffordPet ? 'btn-warning' : 'btn-secondary'}" 
+                style="margin-top: 8px; width: 100%; font-weight: 900;"
+                ${!canAffordPet ? 'disabled' : ''}
+                onclick="ShopManager.buyHelperPet()">
+          🛒 ซื้อหมาน้อย (400 💰)
+        </button>
+      `}
+    `;
+    container.appendChild(petCard);
+
+    // 2. สัตว์เลี้ยงผลิตวัตถุดิบ (ไก่ วัว แกะ)
     const animalItems = Object.values(ANIMALS);
     animalItems.forEach(an => {
       const isUnlocked = gameState.level >= an.unlockLevel;
@@ -275,6 +333,11 @@ function getItemInfo(key) {
   if (key === 'egg') return { name: 'ไข่ไก่', emoji: '🥚', sellPrice: 15 };
   if (key === 'milk') return { name: 'นมวัว', emoji: '🥛', sellPrice: 30 };
   if (key === 'wool') return { name: 'ขนแกะ', emoji: '🧶', sellPrice: 45 };
+  if (key === 'honey') return { name: 'น้ำผึ้งขวดทอง', emoji: '🍯', sellPrice: 45 };
+  if (key === 'barb') return { name: 'ปลาตะเพียนขาว', emoji: '🐟', sellPrice: 30 };
+  if (key === 'catfish') return { name: 'ปลาดุกอุย', emoji: '🐟', sellPrice: 40 };
+  if (key === 'ruby_tilapia') return { name: 'ปลาทับทิม', emoji: '🐠', sellPrice: 50 };
+  if (key === 'giant_catfish') return { name: 'ปลาชะโด', emoji: '🐊', sellPrice: 80 };
   if (PROCESSED_GOODS[key]) {
     return { name: PROCESSED_GOODS[key].name, emoji: PROCESSED_GOODS[key].emoji, sellPrice: PROCESSED_GOODS[key].sellPrice };
   }

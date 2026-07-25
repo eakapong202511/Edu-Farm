@@ -10,7 +10,7 @@ const FactoryManager = {
 
   openBakeryModal() {
     if (typeof AudioManager !== 'undefined') AudioManager.playClick();
-    this.showFactoryPopup('bakery', '🍞 เตาอบขนมปัง 3D', ['bread', 'popcorn']);
+    this.showFactoryPopup('bakery', '🍞 เตาอบขนมปัง 3D', ['bread', 'popcorn', 'honey_bread']);
   },
 
   openCreameryModal() {
@@ -80,8 +80,8 @@ const FactoryManager = {
       {
         id: 'bakery',
         name: '🍞 เตาอบขนมปัง',
-        desc: 'แปรรูปข้าว ข้าวโพด และไข่ ให้เป็นขนมปังแสนอร่อย!',
-        goods: ['bread', 'popcorn'],
+        desc: 'แปรรูปข้าว ข้าวโพด และน้ำผึ้ง ให้เป็นขนมปังแสนอร่อย!',
+        goods: ['bread', 'popcorn', 'honey_bread'],
         unlockLevel: 1
       },
       {

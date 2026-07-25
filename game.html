@@ -148,6 +148,14 @@
           <span>🏅</span>
           <span>Lv.<span id="levelValue">1</span></span>
         </div>
+        <!-- ป้ายสภาพอากาศสุ่ม (Sunny, Rainy, Rainbow) -->
+        <div class="hud-stat hud-weather weather-sunny" id="hudWeatherBadge" title="สภาพอากาศปัจจุบัน">
+          ☀️ แดดใสสดชื่น
+        </div>
+        <!-- ปุ่มวงล้อเสี่ยงโชคความรู้ -->
+        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #FF9800, #F57C00); color: white; border: 1.5px solid #FFE082;" onclick="WheelManager.openWheelModal()" title="หมุนวงล้อเสี่ยงโชคความรู้">
+          🎡 วงล้อโชค
+        </button>
         <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="ShopManager.openInventoryModal()">
           📦 คลัง
         </button>
@@ -165,6 +173,15 @@
         </button>
         <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #7B1FA2, #512DA8); color: white;" onclick="EncyclopediaManager.openBookModal()">
           📖 สารานุกรม
+        </button>
+        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #00838F, #006064); color: white;" onclick="SteamboatManager.openSteamboatModal()" title="เรือไอน้ำขนส่งสินค้าส่งออก">
+          ⛵ เรือสินค้า
+        </button>
+        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #0288D1, #01579B); color: white;" onclick="FishingManager.openFishingModal()" title="บ่อตกปลาธรรมชาติ">
+          🎣 ตกปลา
+        </button>
+        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #FFB300, #F57C00); color: white;" onclick="AchievementManager.openAchievementsModal()" title="ตู้สะสมถ้วยรางวัลเกียรติยศ">
+          🏆 ถ้วยรางวัล
         </button>
         <button class="btn btn-sm btn-secondary" id="btnFullscreen" style="padding: 4px 10px; font-size: 0.8rem; background: #00838F; color: white;" onclick="toggleFullscreen()">
           🖥️ เล่นเต็มจอ
@@ -448,6 +465,44 @@
       </div>
     </div>
 
+    <!-- ⛵ MODAL: เรือไอน้ำขนส่งสินค้าส่งออก -->
+    <div class="modal-overlay" id="steamboatModal">
+      <div class="modal-content" style="max-width: 540px; border: 4px solid #00838F; background: #FFFDF5;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #00838F, #006064); padding: 12px 16px;">
+          <h3 class="modal-title" style="color: white; font-size: 1.15rem;">⛵ เรือไอน้ำขนส่งสินค้าส่งออกทางน้ำ</h3>
+          <button class="modal-close" style="color: white;" onclick="ModalSystem.close('steamboatModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 14px;">
+          <div id="steamboatStatusText" style="margin-bottom: 10px; text-align: center;"></div>
+          <div id="steamboatGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎣 MODAL: บ่อตกปลาธรรมชาติ -->
+    <div class="modal-overlay" id="fishingModal">
+      <div class="modal-content" style="max-width: 500px; border: 4px solid #0288D1; background: #E0F7FA;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #0288D1, #01579B); padding: 12px 16px;">
+          <h3 class="modal-title" style="color: white; font-size: 1.15rem;">🎣 บ่อตกปลาธรรมชาติสายน้ำไหล</h3>
+          <button class="modal-close" style="color: white;" onclick="ModalSystem.close('fishingModal')">&times;</button>
+        </div>
+        <div class="modal-body" id="fishingPondBody" style="padding: 14px;"></div>
+      </div>
+    </div>
+
+    <!-- 🏆 MODAL: ตู้สะสมถ้วยรางวัลเกียรติยศ -->
+    <div class="modal-overlay" id="achievementsModal">
+      <div class="modal-content" style="max-width: 560px; border: 4px solid #FFB300; background: #FFFDF5;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #FFB300, #F57C00); padding: 12px 16px;">
+          <h3 class="modal-title" style="color: white; font-size: 1.15rem;">🏆 ตู้สะสมถ้วยรางวัลเกียรติยศ & เหรียญยศ</h3>
+          <button class="modal-close" style="color: white;" onclick="ModalSystem.close('achievementsModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 14px;">
+          <div id="achievementsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- =========================================
          🔔 TOAST CONTAINER
          ========================================= -->
@@ -467,6 +522,13 @@
   <script src="js/bank.js"></script>
   <script src="js/decoration.js"></script>
   <script src="js/encyclopedia.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/wheel.js"></script>
+  <script src="js/pets.js"></script>
+  <script src="js/beehive.js"></script>
+  <script src="js/steamboat.js"></script>
+  <script src="js/fishing.js"></script>
+  <script src="js/achievements.js"></script>
   <script src="js/farm.js"></script>
   <script>
     // สลับแท็บพื้นที่หน้าฟาร์ม

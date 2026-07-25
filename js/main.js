@@ -89,6 +89,34 @@ const CROPS = {
     waterNeeded: 7,
     unlockLevel: 4,
     description: 'ดอกไม้แห่งพลังงาน กำไรสูง!'
+  },
+  rose: {
+    id: 'rose',
+    name: 'ดอกกุหลาบ',
+    nameEn: 'Rose',
+    emoji: '🌹',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 22,
+    sellPrice: 55,
+    expReward: 28,
+    waterNeeded: 5,
+    unlockLevel: 2,
+    description: 'ดอกกุหลาบแดง ผึ้งชอบมาก เร่งน้ำผึ้ง x2!'
+  },
+  jasmine: {
+    id: 'jasmine',
+    name: 'ดอกมะลิ',
+    nameEn: 'Jasmine',
+    emoji: '🌼',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 25,
+    sellPrice: 60,
+    expReward: 30,
+    waterNeeded: 5,
+    unlockLevel: 3,
+    description: 'ดอกมะลิหอมสดชื่น ผึ้งชอบมาก เร่งน้ำผึ้ง x2!'
   }
 };
 
@@ -201,7 +229,21 @@ const PROCESSED_GOODS = {
     building: 'creamery',
     buildingName: 'โรงแปรรูปนม',
     unlockLevel: 2,
-    description: 'ซอสมะเขือเทศเข้มข้น แปรรูปจากมะเขือเทศ'
+    description: 'ซอสมะเขือเทศเข้มข้น ทำจากมะเขือเทศสด'
+  },
+  honey_bread: {
+    id: 'honey_bread',
+    name: 'ขนมปังหน้าผึ้ง',
+    nameEn: 'Honey Bread',
+    emoji: '🍞🍯',
+    recipe: { rice: 2, honey: 1 },
+    recipeDesc: 'ข้าว 2 + น้ำผึ้ง 1',
+    sellPrice: 120,
+    expReward: 65,
+    building: 'bakery',
+    buildingName: 'เตาอบขนมปัง',
+    unlockLevel: 2,
+    description: 'ขนมปังหน้าผึ้งหอมหวานกรุ่น แปรรูปจากข้าวและน้ำผึ้งขวดทอง!'
   }
 };
 
