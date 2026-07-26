@@ -100,23 +100,93 @@ const CROPS = {
     seedPrice: 22,
     sellPrice: 55,
     expReward: 28,
-    waterNeeded: 5,
-    unlockLevel: 2,
-    description: 'ดอกกุหลาบแดง ผึ้งชอบมาก เร่งน้ำผึ้ง x2!'
+    waterNeeded: 8,
+    unlockLevel: 5,
+    description: 'ดอกไม้แห่งความรัก กำไรดีมาก'
   },
   jasmine: {
     id: 'jasmine',
     name: 'ดอกมะลิ',
     nameEn: 'Jasmine',
-    emoji: '🌼',
+    emoji: '🌸',
     seedEmoji: '🌱',
     growingEmoji: '🌿',
     seedPrice: 25,
     sellPrice: 60,
     expReward: 30,
+    waterNeeded: 8,
+    unlockLevel: 5,
+    description: 'ดอกมะลิหอมชื่นใจ'
+  },
+  carrot: {
+    id: 'carrot',
+    name: 'แครอท',
+    nameEn: 'Carrot',
+    emoji: '🥕',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 12,
+    sellPrice: 28,
+    expReward: 15,
     waterNeeded: 5,
+    unlockLevel: 2,
+    description: 'แครอทสีส้ม โตไว วิตามินสูง'
+  },
+  strawberry: {
+    id: 'strawberry',
+    name: 'สตรอว์เบอร์รี',
+    nameEn: 'Strawberry',
+    emoji: '🍓',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 18,
+    sellPrice: 45,
+    expReward: 22,
+    waterNeeded: 6,
     unlockLevel: 3,
-    description: 'ดอกมะลิหอมสดชื่น ผึ้งชอบมาก เร่งน้ำผึ้ง x2!'
+    description: 'ผลไม้สีแดงสด รสชาติหอมหวาน'
+  },
+  grape: {
+    id: 'grape',
+    name: 'องุ่น',
+    nameEn: 'Grape',
+    emoji: '🍇',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 28,
+    sellPrice: 70,
+    expReward: 35,
+    waterNeeded: 9,
+    unlockLevel: 5,
+    description: 'องุ่นพวงใหญ่ ผลผลิตมีราคาแพง'
+  },
+  pineapple: {
+    id: 'pineapple',
+    name: 'สับปะรด',
+    nameEn: 'Pineapple',
+    emoji: '🍍',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 35,
+    sellPrice: 85,
+    expReward: 42,
+    waterNeeded: 10,
+    unlockLevel: 6,
+    description: 'ผลไม้รสเปรี้ยวอมหวาน ให้ EXP สูง'
+  },
+  pumpkin: {
+    id: 'pumpkin',
+    name: 'ฟักทอง',
+    nameEn: 'Pumpkin',
+    emoji: '🎃',
+    seedEmoji: '🌱',
+    growingEmoji: '🌿',
+    seedPrice: 40,
+    sellPrice: 100,
+    expReward: 50,
+    waterNeeded: 12,
+    unlockLevel: 7,
+    description: 'ฟักทองลูกยักษ์ ปลูกนานแต่คุ้มค่าสุดๆ'
   }
 };
 
@@ -471,7 +541,15 @@ const ToastSystem = {
    * แสดง Toast notification ด้วย SweetAlert2
    */
   show(message, type = 'success') {
-    if (typeof Swal !== 'undefined') {
+    let isModalOpen = false;
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+      const popup = Swal.getPopup();
+      if (popup && !popup.classList.contains('swal2-toast')) {
+        isModalOpen = true;
+      }
+    }
+
+    if (typeof Swal !== 'undefined' && !isModalOpen) {
       const swalTypes = {
         success: 'success',
         error: 'error',

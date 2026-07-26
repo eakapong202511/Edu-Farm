@@ -132,6 +132,11 @@ const FishingManager = {
             ToastSystem.show('🐟 หลุดไปแล้ว! ตอบไม่ทันใน 10 วินาที', 'warning');
           }
         }, 1000);
+      },
+      willClose: () => {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+        }
       }
     });
   },

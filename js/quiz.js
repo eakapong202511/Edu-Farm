@@ -448,9 +448,13 @@ function submitAnswer(choiceIndex) {
       if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
     }
 
-    if (typeof AudioManager !== 'undefined') AudioManager.playQuizSuccessSound();
+    if (typeof AudioManager !== 'undefined' && typeof AudioManager.playCorrect === 'function') {
+      AudioManager.playCorrect();
+    }
   } else {
-    if (typeof AudioManager !== 'undefined') AudioManager.playQuizWrongSound();
+    if (typeof AudioManager !== 'undefined' && typeof AudioManager.playWrong === 'function') {
+      AudioManager.playWrong();
+    }
   }
 
   // แสดง Toast บอกผล

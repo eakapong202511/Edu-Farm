@@ -13,6 +13,16 @@ const ThreeFarmSystem = {
   grassPatches: [],
   trees: [],
   particles: null,
+  lights: {
+    sun: null,
+    hemi: null,
+    nightLights: []
+  },
+  
+  // Day/Night Cycle Settings
+  gameTime: 8, // เริ่มที่เวลา 08:00
+  timeSpeed: 24 / 120, // 1 วัน (24 ชม.) = 2 นาทีในชีวิตจริง (120 วินาที)
+  isNight: false,
   clock: null,
 
   // พาธไฟล์รูป Texture หญ้า grass6.png (isometric-nature-pack)
@@ -113,10 +123,27 @@ const ThreeFarmSystem = {
     sunLight.shadow.camera.top = 15;
     sunLight.shadow.camera.bottom = -15;
     this.scene.add(sunLight);
+    this.lights.sun = sunLight;
 
     // แสงสว่างจากท้องฟ้าและพื้นดิน (Hemisphere Sky Light)
     const hemiLight = new THREE.HemisphereLight(0xB1E0FF, 0x548B2F, 0.7);
     this.scene.add(hemiLight);
+    this.lights.hemi = hemiLight;
+
+    // เตรียมไฟประดับสำหรับตอนกลางคืน (Night Lights)
+    const nightLightPositions = [
+      { x: -8, y: 3, z: -5 },
+      { x: 8, y: 3, z: -5 },
+      { x: -6, y: 2, z: 6 },
+      { x: 6, y: 2, z: 6 }
+    ];
+
+    nightLightPositions.forEach(pos => {
+      const pointLight = new THREE.PointLight(0xFFB300, 0, 15); // สีส้มทอง เริ่มที่ความสว่าง 0
+      pointLight.position.set(pos.x, pos.y, pos.z);
+      this.scene.add(pointLight);
+      this.lights.nightLights.push(pointLight);
+    });
   },
 
   /**
@@ -262,26 +289,26 @@ const ThreeFarmSystem = {
   },
 
   /**
-   * สร้างละอองเกสรเรืองแสง 3D (3D Ambient Pollen Particle System)
+   * สร้างละอองเกสร / หิ่งห้อย (3D Ambient Particles)
    */
   createPollenParticles() {
-    const particleCount = 40;
+    const particleCount = 100;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
 
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 30;
-      positions[i + 1] = Math.random() * 8 - 1;
-      positions[i + 2] = (Math.random() - 0.5) * 18;
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 30; // X
+      positions[i * 3 + 1] = Math.random() * 5 + 0.5;  // Y
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 30; // Z
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({
-      color: 0xFFD700,
-      size: 0.35,
+      color: 0xFFEEAA,
+      size: 0.2,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.6,
       blending: THREE.AdditiveBlending
     });
 
@@ -290,14 +317,87 @@ const ThreeFarmSystem = {
   },
 
   /**
-   * อนิเมชันเคลื่อนไหวต่อเนื่อง (3D Animation Loop)
+   * ควบคุมระบบกลางวัน/กลางคืน
+   */
+  updateDayNightCycle(deltaTime) {
+    this.gameTime += this.timeSpeed * deltaTime;
+    if (this.gameTime >= 24) this.gameTime -= 24;
+
+    // คำนวณความมืด (0 = เที่ยงวัน, 1 = เที่ยงคืน)
+    let darkness = 0;
+    if (this.gameTime > 18) {
+      // 18:00 ถึง 24:00 (มืดลงเรื่อยๆ)
+      darkness = Math.min(1, (this.gameTime - 18) / 3);
+    } else if (this.gameTime < 6) {
+      // 00:00 ถึง 06:00 (สว่างขึ้นเรื่อยๆ)
+      darkness = Math.max(0, 1 - (this.gameTime / 6));
+    } else if (this.gameTime >= 6 && this.gameTime <= 18) {
+      darkness = 0;
+    }
+
+    this.isNight = darkness > 0.5;
+
+    // 1. ปรับ Hemisphere Light (ท้องฟ้า)
+    const daySky = new THREE.Color(0xB1E0FF);
+    const nightSky = new THREE.Color(0x051024);
+    const currentSky = daySky.clone().lerp(nightSky, darkness);
+    
+    const dayGround = new THREE.Color(0x548B2F);
+    const nightGround = new THREE.Color(0x1A2E12);
+    const currentGround = dayGround.clone().lerp(nightGround, darkness);
+
+    this.lights.hemi.color.copy(currentSky);
+    this.lights.hemi.groundColor.copy(currentGround);
+    this.lights.hemi.intensity = 0.7 - (darkness * 0.4);
+
+    // 2. ปรับ Directional Light (พระอาทิตย์ -> พระจันทร์)
+    const sunColor = new THREE.Color(0xFFFAED);
+    const moonColor = new THREE.Color(0x608BBA);
+    this.lights.sun.color.copy(sunColor.clone().lerp(moonColor, darkness));
+    this.lights.sun.intensity = 1.4 - (darkness * 0.9);
+
+    // เคลื่อนที่พระอาทิตย์ (โค้งตามเวลา)
+    const angle = (this.gameTime - 6) / 12 * Math.PI; // 6:00 = 0, 18:00 = PI
+    this.lights.sun.position.x = Math.cos(angle) * 20;
+    this.lights.sun.position.y = Math.sin(angle) * 20 + 5;
+
+    // 3. ปรับแสงไฟกลางคืน (Lanterns)
+    this.lights.nightLights.forEach(light => {
+      light.intensity = darkness * 1.5; // สว่างสุดที่ 1.5
+    });
+
+    // 4. เปลี่ยนละอองเกสร (สีทอง) ให้เป็นหิ่งห้อย (สีเขียวเรืองแสง) ในตอนกลางคืน
+    if (this.particles) {
+      const pollenColor = new THREE.Color(0xFFEEAA);
+      const fireflyColor = new THREE.Color(0x99FF00);
+      this.particles.material.color.copy(pollenColor.clone().lerp(fireflyColor, darkness));
+      // หิ่งห้อยกระพริบตามเวลา
+      if (this.isNight) {
+        this.particles.material.opacity = 0.4 + Math.sin(this.clock.elapsedTime * 3) * 0.3;
+      } else {
+        this.particles.material.opacity = 0.6;
+      }
+    }
+
+    // แจ้ง UI เพื่อปรับสีให้เข้ากับกลางคืน (CSS)
+    const body = document.body;
+    if (this.isNight && !body.classList.contains('night-mode')) {
+      body.classList.add('night-mode');
+    } else if (!this.isNight && body.classList.contains('night-mode')) {
+      body.classList.remove('night-mode');
+    }
+  },
+
+  /**
+   * ฟังก์ชันวนลูปอัปเดต 3D Scene
    */
   animate() {
     requestAnimationFrame(() => this.animate());
 
-    if (!this.clock || !this.renderer || !this.scene || !this.camera) return;
-
+    const deltaTime = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
+
+    this.updateDayNightCycle(deltaTime);
 
     // 1. โยกพุ่มหญ้า 3D เบาๆ ตามสายลม (Swaying Grass Tuft Animation)
     this.grassPatches.forEach((grass, index) => {
@@ -309,9 +409,9 @@ const ThreeFarmSystem = {
       tree.rotation.z = Math.sin(elapsedTime * 1.5 + index) * 0.03;
     });
 
-    // 3. หมุนลอยละอองเกสร 3D ช้าๆ
+    // 3. หมุนลอยละอองเกสร / หิ่งห้อย 3D ช้าๆ
     if (this.particles) {
-      this.particles.rotation.y = elapsedTime * 0.04;
+      this.particles.rotation.y = elapsedTime * (this.isNight ? 0.02 : 0.04);
       const positions = this.particles.geometry.attributes.position.array;
       for (let i = 1; i < positions.length; i += 3) {
         positions[i] += Math.sin(elapsedTime + i) * 0.005;
