@@ -242,7 +242,13 @@ const ShopManager = {
     gameState.coins -= 400;
     gameState.hasHelperPet = true;
 
-    if (typeof AudioManager !== 'undefined') AudioManager.playHarvestSound();
+    if (typeof AudioManager !== 'undefined') {
+      if (typeof AudioManager.playHarvest === 'function') {
+        AudioManager.playHarvest();
+      } else if (typeof AudioManager.playCoinSound === 'function') {
+        AudioManager.playCoinSound();
+      }
+    }
     if (typeof renderHUD === 'function') renderHUD();
     if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
 

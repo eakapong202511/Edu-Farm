@@ -34,7 +34,7 @@ const PetManager = {
       petContainer.id = 'farmPetContainer';
       petContainer.className = 'farm-pet-container';
       
-      const targetParent = document.querySelector('.farm-container') || document.querySelector('.game-page') || document.body;
+      const targetParent = document.body;
       targetParent.appendChild(petContainer);
     }
 

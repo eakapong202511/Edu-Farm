@@ -1391,10 +1391,10 @@ html, body {
    🐶 FARM HELPER PET STYLES
    ========================================= */
 .farm-pet-container {
-  position: absolute;
-  bottom: 18px;
-  left: 18px;
-  z-index: 9999;
+  position: fixed;
+  bottom: 85px;
+  right: 25px;
+  z-index: 99999;
   pointer-events: none;
 }
 
