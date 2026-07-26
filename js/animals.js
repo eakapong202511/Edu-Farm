@@ -44,6 +44,7 @@ const AnimalManager = {
       let animClass = 'anim-chicken-waddle';
       if (animalItem.type === 'cow') animClass = 'anim-cow-sway';
       if (animalItem.type === 'sheep') animClass = 'anim-sheep-graze';
+      if (animalItem.type === 'pig') animClass = 'anim-pig-bounce';
 
       animalsHTML += `
         <div class="ranch-animal-slot ${isReady ? 'slot-ready' : ''}" onclick="AnimalManager.handleAnimalClick(${index})" title="คลิกเพื่อให้อาหาร/เก็บผลผลิต (${animalItem.name})">
@@ -98,41 +99,58 @@ const AnimalManager = {
   },
 
   /**
-   * ให้อาหารสัตว์ (มี Quiz สอดแทรก)
+   * ให้อาหารสัตว์ (มี Quiz สอดแทรก + รองรับถุงอาหารสัตว์)
    */
   feedAnimal(index) {
     const animalItem = gameState.animals[index];
+    if (!animalItem) return;
     const animalType = ANIMALS[animalItem.type];
+    if (!animalType) return;
+    const feedKey = 'feed_' + animalItem.type;
 
     // แสดงคำถามวิทยาศาสตร์/ภาษาอังกฤษก่อนให้อาหาร
+    // ⚠️ ใช้ AnimalManager.renderAnimalPen() แบบ explicit แทน this.renderAnimalPen()
+    // เพราะ callback ถูกเรียกจาก quiz.js ทำให้ 'this' ผิด context
     showQuiz('water', (isCorrect, bonusCoins, bonusExp) => {
-      // ตรวจเหรียญค่าอาหาร
-      if (gameState.coins < animalType.feedPrice) {
-        ToastSystem.show(`💸 เหรียญไม่พอซื้ออาหาร (${animalType.feedPrice} 💰)!`, 'error');
-        return;
+      let usedFeedBag = false;
+
+      // ตรวจสอบถุงอาหารในคลังสินค้า
+      if (gameState.inventory && gameState.inventory[feedKey] && gameState.inventory[feedKey] > 0) {
+        gameState.inventory[feedKey]--;
+        usedFeedBag = true;
+      } else if (gameState.coins >= animalType.feedPrice) {
+        gameState.coins -= animalType.feedPrice;
+      } else {
+        // เงินไม่พอ → ช่วยเติมทุนให้อาหารสัตว์ฟรี
+        gameState.coins += 10;
+        ToastSystem.show(`🎁 ได้รับทุนช่วยเหลือให้อาหารสัตว์ +10 💰!`, 'info');
       }
 
-      gameState.coins -= animalType.feedPrice;
-      animalItem.fedCount++;
+      animalItem.fedCount = (animalItem.fedCount || 0) + 1;
 
       if (typeof QuestManager !== 'undefined') {
         QuestManager.trackProgress('feed', 1);
       }
 
-      // เสียง / เอฟเฟกต์
-      ToastSystem.show(`${animalType.sound} ให้อาหาร${animalType.name}แล้ว! (-${animalType.feedPrice} 💰)`, 'success');
+      // แสดง Toast ผล
+      if (usedFeedBag) {
+        ToastSystem.show(`🥣 ให้อาหาร${animalType.name}ด้วยถุงอาหารสำเร็จ! (เหลือ ${gameState.inventory[feedKey]} ถุง)`, 'success');
+      } else {
+        ToastSystem.show(`${animalType.sound} ให้อาหาร${animalType.name}เรียบร้อยแล้ว!`, 'success');
+      }
 
       if (animalItem.fedCount >= animalType.feedNeeded) {
         animalItem.ready = true;
-        ToastSystem.show(`✨ ${animalType.name}ผลิต ${animalType.produceName} ${animalType.produceEmoji} สำเร็จ!`, 'success');
+        ToastSystem.show(`✨ ${animalType.name}อิ่มแล้ว! ผลิต ${animalType.produceName} ${animalType.produceEmoji} พร้อมเก็บ!`, 'success');
       } else {
         const remaining = animalType.feedNeeded - animalItem.fedCount;
-        ToastSystem.show(`😋 ${animalType.name}อิ่มขึ้น! ให้อาหารอีก ${remaining} ครั้ง`, 'info');
+        ToastSystem.show(`😋 ${animalType.name}อิ่มขึ้น! (ให้อาหารอีก ${remaining} ครั้ง)`, 'info');
       }
 
-      renderHUD();
-      this.renderAnimalPen();
-      SaveSystem.save(gameState);
+      // ✅ ใช้ชื่อ object โดยตรง ไม่ใช้ this
+      if (typeof renderHUD === 'function') renderHUD();
+      if (typeof AnimalManager !== 'undefined') AnimalManager.renderAnimalPen();
+      if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
     });
   },
 
@@ -195,7 +213,8 @@ const AnimalManager = {
     const names = {
       chicken: ['ไก่จ๊อก', 'ไก่กุ๊ก', 'ไก่เด้ง', 'ไก่หวาน'],
       cow: ['แม่วัวมู', 'วัวดนตรี', 'วัวนมสด', 'วัวใจดี'],
-      sheep: ['แกะนุ่ม', 'แกะปุย', 'แกะขาว', 'แกะยิ้ม']
+      sheep: ['แกะนุ่ม', 'แกะปุย', 'แกะขาว', 'แกะยิ้ม'],
+      pig: ['หมูอู๊ด', 'หมูพะโล้', 'หมูนุ่ม', 'หมูพุงกาง']
     };
 
     const typeNames = names[type] || ['น้องสัตว์'];

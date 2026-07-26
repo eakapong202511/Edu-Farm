@@ -43,7 +43,13 @@ async function initFarm() {
   setupModals();
 
   // 2. โหลดระบบคำถามแบบ Async
-  await initQuiz();
+  try {
+    if (typeof loadQuestions === 'function') {
+      await loadQuestions();
+    }
+  } catch (e) {
+    console.warn('⚠️ โหลดคำถามไม่สำเร็จ ใช้คำถามฉุกเฉินในตัว:', e.message);
+  }
 
   // แสดงข้อความต้อนรับ
   setTimeout(() => {
@@ -182,6 +188,8 @@ function handlePlotClick(plotId) {
 // =============================================
 // 🌱 PLANT — ปลูกพืช
 // =============================================
+let activeSeedId = 'rice'; // เมล็ดพันธุ์ที่เลือกไว้เป็นค่าเริ่มต้น (ข้าว 🌾)
+
 function handlePlant(plotId, plot) {
   if (plot.state !== 'empty') {
     ToastSystem.show('⚠️ แปลงนี้มีพืชอยู่แล้ว!', 'warning');
@@ -193,13 +201,11 @@ function handlePlant(plotId, plot) {
   if (typeof showQuiz === 'function') {
     try {
       showQuiz('plant', (isCorrect, bonusCoins, bonusExp) => {
-        if (isCorrect) {
-          ToastSystem.show('✅ ตอบถูก! เลือกเมล็ดพันธุ์ได้เลย!', 'success');
-        } else {
-          ToastSystem.show('💪 ไม่เป็นไร! ยังปลูกได้อยู่นะ', 'info');
-        }
-        renderSeedModal();
-        ModalSystem.open('seedModal');
+        // เมื่อตอบคำถามเสร็จ → แสดงหน้าต่างเลือกพืชที่จะปลูก
+        setTimeout(() => {
+          renderSeedModal(plotId);
+          ModalSystem.open('seedModal');
+        }, 250);
       });
       return;
     } catch (e) {
@@ -207,17 +213,30 @@ function handlePlant(plotId, plot) {
     }
   }
 
-  // Fallback direct modal open
-  renderSeedModal();
+  // Fallback: เปิด seedModal โดยตรง
+  renderSeedModal(plotId);
   ModalSystem.open('seedModal');
 }
 
 /**
- * แสดงรายการเมล็ดพันธุ์ใน Modal
+ * แสดงหน้าต่างเลือกพืชที่จะปลูก
  */
-function renderSeedModal() {
+function showSeedPickerModal(targetPlotId) {
+  const currentPlotId = (targetPlotId !== undefined && targetPlotId !== null) ? targetPlotId : selectedPlotId;
+  selectedPlotId = currentPlotId;
+
+  renderSeedModal(currentPlotId);
+  ModalSystem.open('seedModal');
+}
+
+/**
+ * แสดงรายการเมล็ดพันธุ์ใน Modal (seedModal)
+ */
+function renderSeedModal(targetPlotId) {
   const seedGrid = document.getElementById('seedGrid');
   if (!seedGrid) return;
+
+  const currentPlotId = (targetPlotId !== undefined && targetPlotId !== null) ? targetPlotId : selectedPlotId;
 
   seedGrid.innerHTML = '';
 
@@ -248,7 +267,7 @@ function renderSeedModal() {
     `;
 
     if (!isDisabled) {
-      card.addEventListener('click', () => plantCrop(crop.id));
+      card.addEventListener('click', () => plantCrop(crop.id, currentPlotId));
     }
 
     seedGrid.appendChild(card);
@@ -258,13 +277,20 @@ function renderSeedModal() {
 /**
  * ปลูกพืชลงแปลง
  */
-function plantCrop(cropId) {
-  const crop = CROPS[cropId];
-  if (!crop) return;
+function plantCrop(cropId, targetPlotId = null) {
+  const plotIndex = (targetPlotId !== null && targetPlotId !== undefined) ? targetPlotId : selectedPlotId;
+  let crop = CROPS[cropId] || CROPS['rice'];
+  if (!crop) crop = CROPS['rice'];
+
+  const plot = gameState.plots[plotIndex];
+  if (!plot || plot.state !== 'empty') {
+    ToastSystem.show('⚠️ แปลงนี้ไม่สามารถปลูกได้!', 'warning');
+    return;
+  }
 
   // ตรวจเงิน
   if (gameState.coins < crop.seedPrice) {
-    ToastSystem.show('💸 เหรียญไม่พอ!', 'error');
+    ToastSystem.show(`💸 เหรียญไม่พอซื้อเมล็ด${crop.name} (${crop.seedPrice} 💰)!`, 'error');
     return;
   }
 
@@ -272,10 +298,10 @@ function plantCrop(cropId) {
   gameState.coins -= crop.seedPrice;
 
   // อัปเดตแปลง
-  const plot = gameState.plots[selectedPlotId];
   plot.state = 'planted';
-  plot.crop = cropId;
+  plot.crop = crop.id;
   plot.waterCount = 0;
+  activeSeedId = crop.id;
 
   // อัปเดต UI
   ModalSystem.close('seedModal');
@@ -283,14 +309,14 @@ function plantCrop(cropId) {
   animateHUDValue('coinsValue', gameState.coins);
 
   // แสดงอนิเมชันขุดดิน (Shovel Dig Effect ⛏️)
-  showShovelEffect(selectedPlotId);
+  showShovelEffect(plotIndex);
 
   if (typeof QuestManager !== 'undefined') {
     QuestManager.trackProgress('plant', 1);
   }
 
   // แสดง Toast
-  ToastSystem.show(`🌱 ปลูก${crop.name}แล้ว! (-${crop.seedPrice} 💰)`, 'success');
+  ToastSystem.show(`🌱 ปลูก${crop.name} ${crop.emoji} เรียบร้อยแล้ว! (-${crop.seedPrice} 💰)`, 'success');
 
   // เซฟ
   SaveSystem.save(gameState);

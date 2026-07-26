@@ -9,11 +9,57 @@
 // =============================================
 const AudioManager = {
   ctx: null,
-  bgmEnabled: false,
-  sfxEnabled: true,
+  bgmEnabled: true, // เปิดเพลงอัตโนมัติตั้งแต่เข้าเกม
+  sfxEnabled: true, // เปิดเสียงเอฟเฟกต์อัตโนมัติตั้งแต่เข้าเกม
   bgmVolume: 0.5, // 0.0 ถึง 1.0 (50%)
   bgmInterval: null,
   noteStep: 0,
+  hasAutoStarted: false,
+
+  /**
+   * ระบบเปิดเพลงและเสียงอัตโนมัติทันทีที่เข้าเกม
+   */
+  autoStartAudio() {
+    this.bgmEnabled = true;
+    this.sfxEnabled = true;
+
+    const updateUI = () => {
+      const btnBGM = document.getElementById('btnToggleBGM');
+      const btnSFX = document.getElementById('btnToggleSFX');
+      if (btnBGM) btnBGM.textContent = '🎵 เพลง: เปิด';
+      if (btnSFX) btnSFX.textContent = '🔊 เสียง: เปิด';
+    };
+
+    updateUI();
+
+    const startOnUserGesture = () => {
+      if (this.hasAutoStarted) return;
+      this.initContext();
+      if (this.bgmEnabled && !this.bgmInterval) {
+        this.startBGM();
+        this.hasAutoStarted = true;
+      }
+      updateUI();
+
+      ['pointerdown', 'touchstart', 'click', 'keydown', 'mousemove'].forEach(evt => {
+        window.removeEventListener(evt, startOnUserGesture);
+      });
+    };
+
+    // พยายามเปิดทันทีถ้าระบบเบราว์เซอร์อนุญาต
+    try {
+      this.initContext();
+      if (this.ctx && this.ctx.state === 'running') {
+        this.startBGM();
+        this.hasAutoStarted = true;
+      }
+    } catch (e) {}
+
+    // ผูก Event Listener เมื่อผู้เล่นแตะ/ขยับ/คลิกหน้าจอครั้งแรก ให้เพลงเล่นทันทีอัตโนมัติ
+    ['pointerdown', 'touchstart', 'click', 'keydown', 'mousemove'].forEach(evt => {
+      window.addEventListener(evt, startOnUserGesture, { once: true });
+    });
+  },
 
   /**
    * เพิ่มระดับเสียงเพลง BGM
@@ -59,7 +105,7 @@ const AudioManager = {
   },
 
   // =========================================
-  // 🎼 BGM — ดนตรีบรรยากาศสไตล์ฟาร์ม (HayDay Style)
+  // 🎼 BGM — ดนตรีบรรยากาศแนวคันทรีฟาร์มผ่อนคลาย (Relaxing Acoustic Country Farm)
   // =========================================
 
   /**
@@ -73,7 +119,7 @@ const AudioManager = {
     if (this.bgmEnabled) {
       this.startBGM();
       if (btn) btn.textContent = '🎵 เพลง: เปิด';
-      ToastSystem.show('🎵 เปิดเพลงบรรยากาศฟาร์มเรียบร้อย', 'info');
+      ToastSystem.show('🎵 เปิดเพลงคันทรีฟาร์มผ่อนคลายเรียบร้อย 🍃🌾', 'info');
     } else {
       this.stopBGM();
       if (btn) btn.textContent = '🔇 เพลง: ปิด';
@@ -82,78 +128,178 @@ const AudioManager = {
   },
 
   /**
-   * เริ่มเล่นเพลงพื้นหลัง 8-Bit Hay Day Theme ต้นฉบับ (Exact Hay Day Melody & Moderate 105 BPM Tempo)
+   * เริ่มเล่นเพลงแนวคันทรี ฟาร์ม ผ่อนคลาย (Acoustic Guitar, Banjo Fingerpicking & Country Whistle)
    */
   startBGM() {
     this.stopBGM();
     if (!this.bgmEnabled) return;
     this.initContext();
 
-    // ทำนองหลัก Hay Day Theme ต้นฉบับในรูปแบบ 8-Bit (Exact Hay Day Note Sequence)
-    const hayDayMelody = [
-      // Hook 1: Intro Banjo Roll
-      392.00, 523.25, 659.25, 783.99, 880.00, 783.99, 659.25, 523.25, // G4-C5-E5-G5-A5-G5-E5-C5
-      587.33, 659.25, 698.46, 880.00, 783.99, 659.25, 587.33, 523.25, // D5-E5-F5-A5-G5-E5-D5-C5
-      // Hook 2: Whistle Drop & Chorus
-      659.25, 783.99, 1046.50, 1318.51, 1174.66, 1046.50, 880.00, 783.99, // E5-G5-C6-E6-D6-C6-A5-G5
-      880.00, 783.99, 659.25, 587.33, 523.25, 493.88, 523.25, 0,        // A5-G5-E5-D5-C5-B4-C5-Rest
-      // Hook 3: Staccato Country Bounce
-      392.00, 523.25, 659.25, 783.99, 783.99, 880.00, 783.99, 659.25, // G4-C5-E5-G5-G5-A5-G5-E5
-      698.46, 698.46, 659.25, 587.33, 523.25, 587.33, 659.25, 523.25  // F5-F5-E5-D5-C5-D5-E5-C5
+    // 🌾 ทำนองคันทรีฟาร์มผ่อนคลาย (Acoustic Country Melody & Whistle Notes)
+    const countryMelody = [
+      // Verse A: Acoustic Banjo & Guitar Sunrise Picking
+      523.25, 659.25, 783.99, 659.25, 523.25, 659.25, 783.99, 659.25, // C5-E5-G5-E5-C5-E5-G5-E5 (C Major)
+      493.88, 587.33, 783.99, 587.33, 493.88, 587.33, 783.99, 587.33, // B4-D5-G5-D5-B4-D5-G5-D5 (G Major)
+      440.00, 523.25, 659.25, 523.25, 440.00, 523.25, 659.25, 523.25, // A4-C5-E5-C5-A4-C5-E5-C5 (A Minor)
+      349.23, 440.00, 659.25, 523.25, 349.23, 440.00, 523.25, 0,      // F4-A4-E5-C5-F4-A4-C5-Rest (F Major)
+
+      // Chorus B: Warm Country Whistle & Country Banjo Roll (ผ่อนคลายสบายๆ)
+      783.99, 880.00, 1046.50, 880.00, 783.99, 659.25, 523.25, 659.25, // G5-A5-C6-A5-G5-E5-C5-E5
+      659.25, 587.33, 523.25, 493.88, 523.25, 587.33, 783.99, 0,       // E5-D5-C5-B4-C5-D5-G5-Rest
+      783.99, 1046.50, 1318.51, 1174.66, 1046.50, 880.00, 783.99, 659.25, // G5-C6-E6-D6-C6-A5-G5-E5
+      523.25, 587.33, 659.25, 587.33, 523.25, 493.88, 523.25, 0       // C5-D5-E5-D5-C5-B4-C5-Rest
     ];
 
-    // เบสเดินจังหวะคาวบอย 8-bit อุ่นๆ (Moderate Walking Country Bass)
-    const hayDayBass = [
-      130.81, 196.00, 130.81, 196.00, // C3, G3, C3, G3
-      174.61, 261.63, 174.61, 261.63, // F3, C4, F3, C4
-      196.00, 293.66, 196.00, 293.66, // G3, D4, G3, D4
-      130.81, 196.00, 130.81, 261.63  // C3, G3, C3, C4
+    // 🎻 เบสเดินจังหวะคาวบอยอบอุ่น (Acoustic Walking Country Bass)
+    const countryBass = [
+      130.81, 196.00, 130.81, 196.00, // C3, G3, C3, G3 (C Major)
+      196.00, 293.66, 196.00, 293.66, // G3, D4, G3, D4 (G Major)
+      220.00, 329.63, 220.00, 329.63, // A3, E4, A3, E4 (A Minor)
+      174.61, 261.63, 174.61, 261.63  // F3, C4, F3, C4 (F Major)
     ];
 
     this.noteStep = 0;
     this.bgmInterval = setInterval(() => {
       if (!this.bgmEnabled || !this.ctx) return;
 
-      const melFreq = hayDayMelody[this.noteStep % hayDayMelody.length];
-      const bassFreq = hayDayBass[Math.floor(this.noteStep / 2) % hayDayBass.length];
-      const vol = this.bgmVolume * 2; // คำนวณตามสเกลความดัง
+      const melFreq = countryMelody[this.noteStep % countryMelody.length];
+      const bassFreq = countryBass[Math.floor(this.noteStep / 2) % countryBass.length];
+      const vol = this.bgmVolume * 1.8;
 
-      // 1. ทำนองหลัก 8-bit Square Wave (NES Chiptune Pulse)
+      // 1. ทำนองหลักอคูสติกกีตาร์/แบนโจ (Acoustic Country Pluck & Banjo Roll)
       if (melFreq > 0) {
-        this.playSynthNote(melFreq, 0.18, 'square', 0.05 * vol);
+        this.playCountryPluck(melFreq, 0.28, 0.08 * vol);
       }
 
-      // 2. เบสเดินจังหวะคาวบอย 8-bit Triangle Wave
+      // 2. เสียงนกหวีดคันทรีหวานๆ อบอุ่น (Warm Country Whistle in Chorus)
+      if (this.noteStep >= 32 && melFreq > 0 && this.noteStep % 2 === 0) {
+        this.playCountryWhistle(melFreq * 0.5, 0.35, 0.04 * vol);
+      }
+
+      // 3. เบสเดินคาวบอยนุ่มๆ (Upright Acoustic Bass)
       if (this.noteStep % 2 === 0) {
-        this.playSynthNote(bassFreq, 0.22, 'triangle', 0.07 * vol);
+        this.playCountryBass(bassFreq, 0.32, 0.09 * vol);
       }
 
-      // 3. เสียงเคาะจังหวะ 8-bit Noise Staccato ทุกย่อยจังหวะ
-      if (this.noteStep % 4 === 2 || this.noteStep % 4 === 3) {
-        this.play8BitPercussion(0.015 * vol);
+      // 4. จังหวะแปรงคันทรีผ่อนคลาย (Soft Country Brush Snare)
+      if (this.noteStep % 4 === 2) {
+        this.playCountryBrush(0.012 * vol);
       }
 
       this.noteStep++;
-    }, 285); // 105 BPM จังหวะผ่อนคลายสบายๆ เหมือนต้นฉบับ Hay Day
+    }, 330); // 91 BPM จังหวะคันทรีผ่อนคลาย สบายๆ ชิวๆ
   },
 
   /**
-   * เคาะจังหวะ 8-bit (Chiptune Hi-hat Noise Click)
+   * สังเคราะห์เสียงดีดดีดกีตาร์อคูสติก/แบนโจ (Acoustic Guitar & Banjo Pluck)
    */
-  play8BitPercussion(vol = 0.015) {
+  playCountryPluck(freq, duration, volume = 0.08) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const oscHarmonic = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+      // ใส่โอเวอร์โทนความกังวานของสายกีตาร์
+      oscHarmonic.type = 'triangle';
+      oscHarmonic.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+      osc.connect(filter);
+      oscHarmonic.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      oscHarmonic.start();
+      osc.stop(this.ctx.currentTime + duration);
+      oscHarmonic.stop(this.ctx.currentTime + duration);
+    } catch (e) {}
+  },
+
+  /**
+   * สังเคราะห์เสียงเบสเดินคันทรีอุ่นๆ (Acoustic Upright Bass)
+   */
+  playCountryBass(freq, duration, volume = 0.09) {
     if (!this.ctx) return;
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
-      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.03);
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch (e) {}
+  },
+
+  /**
+   * สังเคราะห์เสียงนกหวีดเป่าคันทรีผ่อนคลาย (Country Farm Whistle)
+   */
+  playCountryWhistle(freq, duration, volume = 0.04) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      // ใส่ Vibrato อ่อนๆ
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.02, this.ctx.currentTime + duration * 0.5);
+
+      gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
       osc.connect(gain);
       gain.connect(this.ctx.destination);
+
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.03);
-    } catch(e) {}
+      osc.stop(this.ctx.currentTime + duration);
+    } catch (e) {}
+  },
+
+  /**
+   * จังหวะแปรงคันทรีนุ่มๆ (Soft Country Brush Snare)
+   */
+  playCountryBrush(volume = 0.012) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.04);
+    } catch (e) {}
   },
 
   /**
@@ -789,7 +935,13 @@ const AudioManager = {
   }
 };
 
-// เริ่มต้นฟังเสียงเมื่อผู้เล่นคลิกบนหน้าจอครั้งแรก
+// เริ่มต้นเปิดระบบเพลงและเสียงอัตโนมัติทันทีที่เข้าเว็บเกม
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    AudioManager.autoStartAudio();
+  }, 300);
+});
+
 document.addEventListener('click', () => {
   AudioManager.initContext();
   AudioManager.startAmbientAnimalSounds();

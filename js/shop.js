@@ -292,7 +292,7 @@ const ShopManager = {
     `;
     container.appendChild(petCard);
 
-    // 2. สัตว์เลี้ยงผลิตวัตถุดิบ (ไก่ วัว แกะ)
+    // 2. สัตว์เลี้ยงผลิตวัตถุดิบ (ไก่ วัว แกะ หมู)
     const animalItems = Object.values(ANIMALS);
     animalItems.forEach(an => {
       const isUnlocked = gameState.level >= an.unlockLevel;
@@ -317,6 +317,79 @@ const ShopManager = {
 
       container.appendChild(card);
     });
+
+    // 🥣 3. อาหารสัตว์ (กดใส่จำนวนที่ต้องการและซื้อได้เลย)
+    const animalFeeds = [
+      { id: 'feed_chicken', name: 'อาหารไก่', emoji: '🌾🥣', price: 5, target: '🐔 สำหรับไก่' },
+      { id: 'feed_cow', name: 'อาหารวัว', emoji: '🌽🥣', price: 8, target: '🐄 สำหรับวัว' },
+      { id: 'feed_sheep', name: 'อาหารแกะ', emoji: '🌿🥣', price: 10, target: '🐑 สำหรับแกะ' },
+      { id: 'feed_pig', name: 'อาหารหมู', emoji: '🥣🐖', price: 12, target: '🐖 สำหรับหมู' }
+    ];
+
+    animalFeeds.forEach(fd => {
+      const feedCard = document.createElement('div');
+      feedCard.style.cssText = 'background: #F1F8E9; border: 2px solid #81C784; border-radius: 12px; padding: 10px; text-align: center;';
+
+      feedCard.innerHTML = `
+        <div style="font-size: 2.2rem;">${fd.emoji}</div>
+        <div style="font-weight: 900; color: #2E7D32; font-size: 0.95rem;">${fd.name}</div>
+        <div style="font-size: 0.75rem; color: #558B2F;">${fd.target}</div>
+        <div style="font-size: 0.82rem; color: #E65100; font-weight: bold; margin-top: 4px;">ราคา: ${fd.price} 💰/ถุง</div>
+        
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 6px;">
+          <button class="btn btn-sm btn-secondary" style="padding: 1px 7px; font-weight: bold;" onclick="ShopManager.changeFeedQty('${fd.id}', -1)">➖</button>
+          <input type="number" id="feedQty_${fd.id}" data-unit-price="${fd.price}" value="1" min="1" max="99" style="width: 42px; text-align: center; font-weight: bold; border: 1.5px solid #81C784; border-radius: 6px; padding: 2px 0;" onchange="ShopManager.updateFeedPrice('${fd.id}')">
+          <button class="btn btn-sm btn-secondary" style="padding: 1px 7px; font-weight: bold;" onclick="ShopManager.changeFeedQty('${fd.id}', 1)">➕</button>
+        </div>
+        
+        <div id="feedTotalPrice_${fd.id}" style="font-size: 0.8rem; color: #D84315; font-weight: 900; margin-top: 4px;">ราคารวม: ${fd.price} 💰</div>
+        
+        <button class="btn btn-sm btn-success" style="margin-top: 6px; width: 100%; font-weight: 900; font-size: 0.8rem;" onclick="ShopManager.buyAnimalFeed('${fd.id}', ${fd.price}, '${fd.name}')">
+          🛒 ซื้ออาหารสัตว์
+        </button>
+      `;
+
+      container.appendChild(feedCard);
+    });
+  },
+
+  changeFeedQty(feedId, delta) {
+    const input = document.getElementById('feedQty_' + feedId);
+    if (!input) return;
+    let current = parseInt(input.value) || 1;
+    current = Math.max(1, Math.min(99, current + delta));
+    input.value = current;
+    this.updateFeedPrice(feedId);
+  },
+
+  updateFeedPrice(feedId) {
+    const input = document.getElementById('feedQty_' + feedId);
+    if (!input) return;
+    const current = Math.max(1, parseInt(input.value) || 1);
+    const unitPrice = parseInt(input.dataset.unitPrice) || 5;
+    const display = document.getElementById('feedTotalPrice_' + feedId);
+    if (display) display.textContent = `ราคารวม: ${current * unitPrice} 💰`;
+  },
+
+  buyAnimalFeed(feedId, unitPrice, feedName) {
+    const input = document.getElementById('feedQty_' + feedId);
+    const qty = input ? Math.max(1, parseInt(input.value) || 1) : 1;
+    const totalCost = qty * unitPrice;
+
+    if (gameState.coins < totalCost) {
+      ToastSystem.show(`💸 เหรียญไม่พอซื้อ ${feedName} ${qty} ถุง (${totalCost} 💰)!`, 'error');
+      return;
+    }
+
+    gameState.coins -= totalCost;
+    if (!gameState.inventory) gameState.inventory = {};
+    gameState.inventory[feedId] = (gameState.inventory[feedId] || 0) + qty;
+
+    if (typeof AudioManager !== 'undefined') AudioManager.playHarvest();
+    if (typeof renderHUD === 'function') renderHUD();
+    if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
+
+    ToastSystem.show(`🎉 ซื้อ ${feedName} ${qty} ถุง สำเร็จ! (มีในคลัง ${gameState.inventory[feedId]} ถุง) (-${totalCost} 💰)`, 'success');
   }
 };
 
@@ -333,6 +406,11 @@ function getItemInfo(key) {
   if (key === 'egg') return { name: 'ไข่ไก่', emoji: '🥚', sellPrice: 15 };
   if (key === 'milk') return { name: 'นมวัว', emoji: '🥛', sellPrice: 30 };
   if (key === 'wool') return { name: 'ขนแกะ', emoji: '🧶', sellPrice: 45 };
+  if (key === 'pork') return { name: 'เนื้อหมูสด', emoji: '🥩', sellPrice: 50 };
+  if (key === 'feed_chicken') return { name: 'อาหารไก่', emoji: '🌾🥣', sellPrice: 5 };
+  if (key === 'feed_cow') return { name: 'อาหารวัว', emoji: '🌽🥣', sellPrice: 8 };
+  if (key === 'feed_sheep') return { name: 'อาหารแกะ', emoji: '🌿🥣', sellPrice: 10 };
+  if (key === 'feed_pig') return { name: 'อาหารหมู', emoji: '🥣🐖', sellPrice: 12 };
   if (key === 'honey') return { name: 'น้ำผึ้งขวดทอง', emoji: '🍯', sellPrice: 45 };
   if (key === 'barb') return { name: 'ปลาตะเพียนขาว', emoji: '🐟', sellPrice: 30 };
   if (key === 'catfish') return { name: 'ปลาดุกอุย', emoji: '🐟', sellPrice: 40 };

@@ -10,12 +10,12 @@ const FactoryManager = {
 
   openBakeryModal() {
     if (typeof AudioManager !== 'undefined') AudioManager.playClick();
-    this.showFactoryPopup('bakery', '🍞 เตาอบขนมปัง 3D', ['bread', 'popcorn', 'honey_bread']);
+    this.showFactoryPopup('bakery', '🍞 เตาอบขนมปัง 3D', ['bread', 'popcorn', 'honey_bread', 'bacon_bread', 'sweet_corn_cake']);
   },
 
   openCreameryModal() {
     if (typeof AudioManager !== 'undefined') AudioManager.playClick();
-    this.showFactoryPopup('creamery', '🧀 โรงแปรรูปนม & ชีส 3D', ['cheese', 'tomato_sauce']);
+    this.showFactoryPopup('creamery', '🧀 โรงแปรรูปนม & อาหาร 3D', ['cheese', 'tomato_sauce', 'pork_sausage']);
   },
 
   showFactoryPopup(facId, title, goodsKeys) {
@@ -80,15 +80,15 @@ const FactoryManager = {
       {
         id: 'bakery',
         name: '🍞 เตาอบขนมปัง',
-        desc: 'แปรรูปข้าว ข้าวโพด และน้ำผึ้ง ให้เป็นขนมปังแสนอร่อย!',
-        goods: ['bread', 'popcorn', 'honey_bread'],
+        desc: 'แปรรูปข้าว ข้าวโพด น้ำผึ้ง และเนื้อหมู ให้เป็นขนมปังแสนอร่อย!',
+        goods: ['bread', 'popcorn', 'honey_bread', 'bacon_bread', 'sweet_corn_cake'],
         unlockLevel: 1
       },
       {
         id: 'creamery',
-        name: '🧀 โรงแปรรูปนม & ผลไม้',
-        desc: 'แปรรูปนมวัวสดและมะเขือเทศ ให้เป็นชีสและซอสเข้มข้น!',
-        goods: ['cheese', 'tomato_sauce'],
+        name: '🧀 โรงแปรรูปนม & อาหาร',
+        desc: 'แปรรูปนมวัวสด มะเขือเทศ และเนื้อหมู ให้เป็นชีส ซอส และไส้กรอกหมูรมควัน!',
+        goods: ['cheese', 'tomato_sauce', 'pork_sausage'],
         unlockLevel: 2
       }
     ];
@@ -213,6 +213,8 @@ function getItemName(key) {
   if (key === 'egg') return '🥚 ไข่ไก่';
   if (key === 'milk') return '🥛 นมวัว';
   if (key === 'wool') return '🧶 ขนแกะ';
+  if (key === 'pork') return '🥩 เนื้อหมูสด';
+  if (key === 'honey') return '🍯 น้ำผึ้งขวดทอง';
   if (PROCESSED_GOODS[key]) return PROCESSED_GOODS[key].emoji + ' ' + PROCESSED_GOODS[key].name;
   return key;
 }

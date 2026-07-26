@@ -168,6 +168,21 @@ const ANIMALS = {
     expReward: 20,
     unlockLevel: 3,
     sound: 'แบ๊ะะ! 🐑'
+  },
+  pig: {
+    id: 'pig',
+    name: 'หมู',
+    nameEn: 'Pig',
+    emoji: '🐖',
+    produceEmoji: '🥩',
+    produceName: 'เนื้อหมูสด',
+    produceKey: 'pork',
+    feedNeeded: 3,
+    feedPrice: 10,
+    sellPrice: 50,
+    expReward: 25,
+    unlockLevel: 2,
+    sound: 'อู๊ดๆ! 🐖'
   }
 };
 
@@ -244,6 +259,48 @@ const PROCESSED_GOODS = {
     buildingName: 'เตาอบขนมปัง',
     unlockLevel: 2,
     description: 'ขนมปังหน้าผึ้งหอมหวานกรุ่น แปรรูปจากข้าวและน้ำผึ้งขวดทอง!'
+  },
+  bacon_bread: {
+    id: 'bacon_bread',
+    name: 'ขนมปังเบคอนหมู',
+    nameEn: 'Pork Bacon Bread',
+    emoji: '🍞🥓',
+    recipe: { rice: 2, pork: 1 },
+    recipeDesc: 'ข้าว 2 + เนื้อหมู 1',
+    sellPrice: 135,
+    expReward: 70,
+    building: 'bakery',
+    buildingName: 'เตาอบขนมปัง',
+    unlockLevel: 2,
+    description: 'ขนมปังเบคอนหมูหอมอบกรุ่น ทำจากข้าวและเนื้อหมูสด!'
+  },
+  pork_sausage: {
+    id: 'pork_sausage',
+    name: 'ไส้กรอกหมูรมควัน',
+    nameEn: 'Smoked Pork Sausage',
+    emoji: '🌭',
+    recipe: { pork: 2, corn: 1 },
+    recipeDesc: 'เนื้อหมู 2 + ข้าวโพด 1',
+    sellPrice: 160,
+    expReward: 85,
+    building: 'creamery',
+    buildingName: 'โรงแปรรูปอาหาร',
+    unlockLevel: 2,
+    description: 'ไส้กรอกหมูรมควันเนื้อแน่น หอมมันน่าทาน!'
+  },
+  sweet_corn_cake: {
+    id: 'sweet_corn_cake',
+    name: 'เค้กข้าวโพดนุ่มลิ้น',
+    nameEn: 'Sweet Corn Cake',
+    emoji: '🧁',
+    recipe: { corn: 2, egg: 1, milk: 1 },
+    recipeDesc: 'ข้าวโพด 2 + ไข่ไก่ 1 + นมวัว 1',
+    sellPrice: 180,
+    expReward: 95,
+    building: 'bakery',
+    buildingName: 'เตาอบขนมปัง',
+    unlockLevel: 3,
+    description: 'เค้กข้าวโพดนุ่มลิ้นราดซอส หอมหวานละมุนลิ้น!'
   }
 };
 

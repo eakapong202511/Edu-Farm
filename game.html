@@ -130,78 +130,179 @@
     <!-- =========================================
          🎯 HUD — แถบข้อมูลด้านบน
          ========================================= -->
+    <!-- =========================================
+         🎯 HUD — แถบข้อมูลด้านบนสุด (Sleek Organized Premium Header)
+         ========================================= -->
     <header class="hud-bar" id="hudBar">
-      <div class="hud-player">
-        <div class="hud-avatar">🧒</div>
-        <span class="hud-name" id="hudName">เกษตรกร</span>
+      <!-- 🧑‍🌾 ฝั่งซ้าย: ข้อมูลผู้เล่น & ค่าสเตตัส -->
+      <div class="hud-left">
+        <div class="hud-player">
+          <div class="hud-avatar">🧒</div>
+          <span class="hud-name" id="hudName">เกษตรกร</span>
+        </div>
+        <div class="hud-stats-group">
+          <div class="hud-stat hud-coins" id="hudCoins" title="เหรียญทอง">
+            <span>💰</span>
+            <span id="coinsValue">100</span>
+          </div>
+          <div class="hud-stat hud-exp" id="hudExp" title="ประสบการณ์ ⭐">
+            <span>⭐</span>
+            <span id="expValue">0</span>
+          </div>
+          <div class="hud-stat hud-level" id="hudLevel" title="ระดับชั้นเกษตรกร">
+            <span>👑</span>
+            <span>Lv.<span id="levelValue">1</span></span>
+          </div>
+          <!-- ป้ายสภาพอากาศสุ่ม -->
+          <div class="hud-stat hud-weather weather-sunny" id="hudWeatherBadge" title="สภาพอากาศปัจจุบัน">
+            ☀️ แดดใสสดชื่น
+          </div>
+        </div>
       </div>
-      <div class="hud-stats">
-        <div class="hud-stat hud-coins" id="hudCoins">
-          <span>💰</span>
-          <span id="coinsValue">100</span>
-        </div>
-        <div class="hud-stat hud-exp" id="hudExp">
-          <span>⭐</span>
-          <span id="expValue">0</span>
-        </div>
-        <div class="hud-stat hud-level" id="hudLevel">
-          <span>🏅</span>
-          <span>Lv.<span id="levelValue">1</span></span>
-        </div>
-        <!-- ป้ายสภาพอากาศสุ่ม (Sunny, Rainy, Rainbow) -->
-        <div class="hud-stat hud-weather weather-sunny" id="hudWeatherBadge" title="สภาพอากาศปัจจุบัน">
-          ☀️ แดดใสสดชื่น
-        </div>
-        <!-- ปุ่มวงล้อเสี่ยงโชคความรู้ -->
-        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #FF9800, #F57C00); color: white; border: 1.5px solid #FFE082;" onclick="WheelManager.openWheelModal()" title="หมุนวงล้อเสี่ยงโชคความรู้">
-          🎡 วงล้อโชค
-        </button>
-        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="ShopManager.openInventoryModal()">
-          📦 คลัง
-        </button>
-        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="ShopManager.openOrderBoardModal()">
-          🚚 ออเดอร์
-        </button>
-        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="QuestManager.openQuestModal()">
-          📋 ภารกิจ
-        </button>
-        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="BankManager.openBankModal()">
-          🏦 ธนาคาร
-        </button>
-        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem;" onclick="DecorationManager.openDecorationModal()">
-          🎨 ของแต่ง
-        </button>
-        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #7B1FA2, #512DA8); color: white;" onclick="EncyclopediaManager.openBookModal()">
-          📖 สารานุกรม
-        </button>
-        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #00838F, #006064); color: white;" onclick="SteamboatManager.openSteamboatModal()" title="เรือไอน้ำขนส่งสินค้าส่งออก">
-          ⛵ เรือสินค้า
-        </button>
-        <button class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #0288D1, #01579B); color: white;" onclick="FishingManager.openFishingModal()" title="บ่อตกปลาธรรมชาติ">
-          🎣 ตกปลา
-        </button>
-        <button class="btn btn-sm btn-warning" style="padding: 4px 10px; font-size: 0.8rem; background: linear-gradient(135deg, #FFB300, #F57C00); color: white;" onclick="AchievementManager.openAchievementsModal()" title="ตู้สะสมถ้วยรางวัลเกียรติยศ">
-          🏆 ถ้วยรางวัล
-        </button>
-        <button class="btn btn-sm btn-secondary" id="btnFullscreen" style="padding: 4px 10px; font-size: 0.8rem; background: #00838F; color: white;" onclick="toggleFullscreen()">
-          🖥️ เล่นเต็มจอ
-        </button>
-        <button class="btn btn-sm btn-secondary" id="btnToggleBGM" style="padding: 4px 10px; font-size: 0.8rem;" onclick="AudioManager.toggleBGM()">
-          🔇 เพลง: ปิด
-        </button>
-        <!-- ปุ่มปรับระดับเสียงเพลง BGM -->
-        <div style="display: inline-flex; align-items: center; background: rgba(0, 0, 0, 0.25); border-radius: 20px; padding: 2px 6px; gap: 4px;" title="ปรับระดับเสียงเพลง">
-          <button class="btn btn-sm" style="padding: 0; font-size: 0.75rem; background: #FF7043; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;" onclick="AudioManager.decreaseBGMVolume()" title="ลดเสียงเพลง">
-            ➖
+
+      <!-- 🌟 ฝั่งขวา: 4 หมวดหมู่เมนูพรีเมียม (Dropdown Popover) -->
+      <div class="hud-right">
+        
+        <!-- หมวดหมู่ 1: 🎪 มินิเกม & กิจกรรม -->
+        <div class="hud-dropdown-wrapper">
+          <button class="hud-cat-btn btn-activities" onclick="toggleHudDropdown('dropdownActivities', event)" title="เรือสินค้า, บ่อตกปลา, วงล้อเสี่ยงโชค">
+            <span class="hud-cat-icon">🎪</span>
+            <span class="hud-cat-text">กิจกรรมพิเศษ</span>
+            <span class="hud-cat-arrow">▾</span>
           </button>
-          <span id="bgmVolumeText" style="font-size: 0.75rem; font-weight: 800; color: #FFF; min-width: 32px; text-align: center;">50%</span>
-          <button class="btn btn-sm" style="padding: 0; font-size: 0.75rem; background: #66BB6A; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;" onclick="AudioManager.increaseBGMVolume()" title="เพิ่มเสียงเพลง">
-            ➕
-          </button>
+          <div class="hud-dropdown-popover" id="dropdownActivities">
+            <div class="hud-dropdown-item" onclick="SteamboatManager.openSteamboatModal(); closeAllHudDropdowns();">
+              <span class="item-icon">⛵</span>
+              <div class="item-info">
+                <div class="item-title">เรือไอน้ำขนส่งสินค้า</div>
+                <div class="item-desc">บรรจุสินค้าส่งออกรับเหรียญยศ</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="FishingManager.openFishingModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🎣</span>
+              <div class="item-info">
+                <div class="item-title">บ่อตกปลาธรรมชาติ</div>
+                <div class="item-desc">มินิเกมคณิตคิดเร็ว 10 วินาที</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="WheelManager.openWheelModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🎡</span>
+              <div class="item-info">
+                <div class="item-title">วงล้อโชคความรู้</div>
+                <div class="item-desc">หมุนเสี่ยงโชคสะสมรางวัล</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-sm btn-secondary" id="btnToggleSFX" style="padding: 4px 10px; font-size: 0.8rem;" onclick="AudioManager.toggleSFX()">
-          🔊 เสียง: เปิด
-        </button>
+
+        <!-- หมวดหมู่ 2: 📚 ศูนย์ความรู้ & เกียรติยศ -->
+        <div class="hud-dropdown-wrapper">
+          <button class="hud-cat-btn btn-edu" onclick="toggleHudDropdown('dropdownEdu', event)" title="สารานุกรม 6 วิชา, ภารกิจ, ถ้วยรางวัล">
+            <span class="hud-cat-icon">📚</span>
+            <span class="hud-cat-text">ความรู้ & รางวัล</span>
+            <span class="hud-cat-arrow">▾</span>
+          </button>
+          <div class="hud-dropdown-popover" id="dropdownEdu">
+            <div class="hud-dropdown-item" onclick="EncyclopediaManager.openBookModal(); closeAllHudDropdowns();">
+              <span class="item-icon">📖</span>
+              <div class="item-info">
+                <div class="item-title">สารานุกรม 6 วิชา</div>
+                <div class="item-desc">ตำราเรียนรู้พืช สัตว์ เครื่องมือ</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="QuestManager.openQuestModal(); closeAllHudDropdowns();">
+              <span class="item-icon">📋</span>
+              <div class="item-info">
+                <div class="item-title">ภารกิจประจำวัน</div>
+                <div class="item-desc">ทำภารกิจสะสมรางวัล</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="AchievementManager.openAchievementsModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🏆</span>
+              <div class="item-info">
+                <div class="item-title">ตู้สะสมถ้วยรางวัล</div>
+                <div class="item-desc">ตู้โชว์เกียรติยศถ้วยทอง</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- หมวดหมู่ 3: 🏦 บริการ & จัดการฟาร์ม -->
+        <div class="hud-dropdown-wrapper">
+          <button class="hud-cat-btn btn-services" onclick="toggleHudDropdown('dropdownServices', event)" title="ธนาคาร, ของแต่งฟาร์ม, คลังสินค้า, ออเดอร์">
+            <span class="hud-cat-icon">🏦</span>
+            <span class="hud-cat-text">จัดการฟาร์ม</span>
+            <span class="hud-cat-arrow">▾</span>
+          </button>
+          <div class="hud-dropdown-popover" id="dropdownServices">
+            <div class="hud-dropdown-item" onclick="BankManager.openBankModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🏦</span>
+              <div class="item-info">
+                <div class="item-title">ธนาคารออมสิน</div>
+                <div class="item-desc">ฝากถอนเงินออมรับดอกเบี้ย</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="DecorationManager.openDecorationModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🎨</span>
+              <div class="item-info">
+                <div class="item-title">ร้านของแต่งฟาร์ม</div>
+                <div class="item-desc">ตกแต่งฟาร์มสไตล์ 2.5D</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="ShopManager.openInventoryModal(); closeAllHudDropdowns();">
+              <span class="item-icon">📦</span>
+              <div class="item-info">
+                <div class="item-title">คลังสินค้า</div>
+                <div class="item-desc">ดูผลผลิตและวัตถุดิบ</div>
+              </div>
+            </div>
+            <div class="hud-dropdown-item" onclick="ShopManager.openOrderBoardModal(); closeAllHudDropdowns();">
+              <span class="item-icon">🚚</span>
+              <div class="item-info">
+                <div class="item-title">กระดานออเดอร์</div>
+                <div class="item-desc">ส่งสินค้าตามคำสั่งซื้อ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- หมวดหมู่ 4: ⚙️ ตั้งค่าเสียง & จอ -->
+        <div class="hud-dropdown-wrapper">
+          <button class="hud-cat-btn btn-settings" onclick="toggleHudDropdown('dropdownSettings', event)" title="เปิดปิดเพลง, ปรับความดัง, โหมดเต็มจอ">
+            <span class="hud-cat-icon">⚙️</span>
+            <span class="hud-cat-text">ตั้งค่า</span>
+            <span class="hud-cat-arrow">▾</span>
+          </button>
+          <div class="hud-dropdown-popover dropdown-popover-right" id="dropdownSettings">
+            <div class="hud-dropdown-setting-row">
+              <span>🖥️ โหมดเต็มจอ:</span>
+              <button class="btn btn-sm btn-secondary" id="btnFullscreen" onclick="toggleFullscreen()">
+                เล่นเต็มจอ
+              </button>
+            </div>
+            <div class="hud-dropdown-setting-row">
+              <span>🎵 เพลง BGM:</span>
+              <button class="btn btn-sm btn-secondary" id="btnToggleBGM" onclick="AudioManager.toggleBGM()">
+                เปิด/ปิด
+              </button>
+            </div>
+            <div class="hud-dropdown-setting-row">
+              <span>🔊 ระดับเสียง:</span>
+              <div class="vol-control-pill">
+                <button class="vol-btn" onclick="AudioManager.decreaseBGMVolume()">➖</button>
+                <span id="bgmVolumeText">50%</span>
+                <button class="vol-btn" onclick="AudioManager.increaseBGMVolume()">➕</button>
+              </div>
+            </div>
+            <div class="hud-dropdown-setting-row">
+              <span>🔔 เสียงเอฟเฟกต์:</span>
+              <button class="btn btn-sm btn-secondary" id="btnToggleSFX" onclick="AudioManager.toggleSFX()">
+                เปิด/ปิด
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </header>
 
@@ -510,26 +611,30 @@
 
   </div>
 
-  <script src="js/main.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/avatar.js"></script>
-  <script src="js/quiz.js"></script>
-  <script src="js/animals.js"></script>
-  <script src="js/factory.js"></script>
-  <script src="js/shop.js"></script>
-  <script src="js/quest.js"></script>
-  <script src="js/bank.js"></script>
-  <script src="js/decoration.js"></script>
-  <script src="js/encyclopedia.js"></script>
-  <script src="js/weather.js"></script>
-  <script src="js/wheel.js"></script>
-  <script src="js/pets.js"></script>
-  <script src="js/beehive.js"></script>
-  <script src="js/steamboat.js"></script>
-  <script src="js/fishing.js"></script>
-  <script src="js/achievements.js"></script>
-  <script src="js/farm.js"></script>
+  <!-- Three.js 3D Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/three_farm.js?v=2"></script>
+
+  <script src="js/main.js?v=2"></script>
+  <script src="js/api.js?v=2"></script>
+  <script src="js/audio.js?v=2"></script>
+  <script src="js/avatar.js?v=2"></script>
+  <script src="js/quiz.js?v=2"></script>
+  <script src="js/animals.js?v=2"></script>
+  <script src="js/factory.js?v=2"></script>
+  <script src="js/shop.js?v=2"></script>
+  <script src="js/quest.js?v=2"></script>
+  <script src="js/bank.js?v=2"></script>
+  <script src="js/decoration.js?v=2"></script>
+  <script src="js/encyclopedia.js?v=2"></script>
+  <script src="js/weather.js?v=2"></script>
+  <script src="js/wheel.js?v=2"></script>
+  <script src="js/pets.js?v=2"></script>
+  <script src="js/beehive.js?v=2"></script>
+  <script src="js/steamboat.js?v=2"></script>
+  <script src="js/fishing.js?v=2"></script>
+  <script src="js/achievements.js?v=2"></script>
+  <script src="js/farm.js?v=2"></script>
   <script>
     // สลับแท็บพื้นที่หน้าฟาร์ม
     function switchFarmTab(tabName) {
@@ -556,6 +661,34 @@
         if (typeof FactoryManager !== 'undefined') FactoryManager.renderFactories();
       }
     }
+
+    // สลับเปิดปิดเมนูหมวดหมู่ HUD ด้านบน
+    function toggleHudDropdown(dropdownId, event) {
+      if (event) event.stopPropagation();
+      const dropdown = document.getElementById(dropdownId);
+      if (!dropdown) return;
+      const isShow = dropdown.classList.contains('show');
+      
+      closeAllHudDropdowns();
+      
+      if (!isShow) {
+        dropdown.classList.add('show');
+        if (event && event.currentTarget) {
+          event.currentTarget.classList.add('active');
+        }
+      }
+    }
+
+    function closeAllHudDropdowns() {
+      document.querySelectorAll('.hud-dropdown-popover').forEach(pop => pop.classList.remove('show'));
+      document.querySelectorAll('.hud-cat-btn').forEach(btn => btn.classList.remove('active'));
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.hud-dropdown-wrapper')) {
+        closeAllHudDropdowns();
+      }
+    });
 
     // เรียกการันตีการโหลด UI, 3D Animals และ 3D Avatar
     document.addEventListener('DOMContentLoaded', () => {

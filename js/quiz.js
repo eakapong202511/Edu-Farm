@@ -342,9 +342,11 @@ function renderQuizModal(question, activity) {
     harvest: 'โบนัสการเก็บเกี่ยว!'
   };
 
+  const choiceClasses = ['choice-a', 'choice-b', 'choice-c', 'choice-d'];
+  const choiceLetters = ['A', 'B', 'C', 'D'];
   const choicesHtml = question.choices.map((choice, index) => `
-    <button class="choice-btn" onclick="submitAnswer(${index})">
-      <span class="choice-letter">${String.fromCharCode(65 + index)}</span>
+    <button class="choice-btn ${choiceClasses[index]}" onclick="submitAnswer(${index})">
+      <span class="choice-letter-badge">${choiceLetters[index]}</span>
       <span class="choice-text">${sanitizeChoiceText(choice)}</span>
     </button>
   `).join('');
@@ -391,7 +393,11 @@ function showQuizHint() {
 function submitAnswer(choiceIndex) {
   if (!currentQuiz) return;
 
-  const isCorrect = (choiceIndex === currentQuiz.answer);
+  // เก็บอ้างอิงคำถามและ callback ไว้ก่อนล้าง
+  const quiz = currentQuiz;
+  const cb = quizCallback;
+
+  const isCorrect = (choiceIndex === quiz.answer);
   
   // อัปเดตสถิติ
   quizStats.totalAnswered++;
@@ -402,6 +408,10 @@ function submitAnswer(choiceIndex) {
     quizStats.streak = 0;
   }
 
+  // ล้างสถานะปัจจุบันทันที (ป้องกันกดซ้ำ)
+  currentQuiz = null;
+  quizCallback = null;
+
   // ปิด Modal
   ModalSystem.close('quizModal');
 
@@ -410,7 +420,7 @@ function submitAnswer(choiceIndex) {
   let bonusExp = 0;
 
   if (isCorrect) {
-    bonusCoins = (currentQuiz.reward === 'coin') ? 15 : 10;
+    bonusCoins = (quiz.reward === 'coin') ? 15 : 10;
     bonusExp = 10;
     
     // โบนัสตอบถูกติดต่อกัน
@@ -418,6 +428,24 @@ function submitAnswer(choiceIndex) {
       bonusCoins += 5;
       bonusExp += 5;
       ToastSystem.show(`🔥 ตอบถูก ${quizStats.streak} ข้อติด! ได้โบนัสพิเศษ!`, 'success');
+    }
+
+    // 💰⭐ เพิ่มเหรียญและ EXP เข้าสู่ gameState ทันที!
+    if (typeof gameState !== 'undefined' && gameState) {
+      gameState.coins = (gameState.coins || 0) + bonusCoins;
+      gameState.exp = (gameState.exp || 0) + bonusExp;
+
+      // ตรวจสอบเลเวลอัพ
+      if (typeof LevelSystem !== 'undefined') {
+        const newLevel = LevelSystem.calculateLevel(gameState.exp);
+        if (newLevel > gameState.level) {
+          gameState.level = newLevel;
+          ToastSystem.show(`🎊 เลเวลอัพ! คุณขึ้นเป็น เลเวล ${gameState.level}!`, 'success');
+        }
+      }
+
+      if (typeof renderHUD === 'function') renderHUD();
+      if (typeof SaveSystem !== 'undefined') SaveSystem.save(gameState);
     }
 
     if (typeof AudioManager !== 'undefined') AudioManager.playQuizSuccessSound();
@@ -429,15 +457,20 @@ function submitAnswer(choiceIndex) {
   if (isCorrect) {
     ToastSystem.show(`✨ ตอบถูกต้อง! ได้รับโบนัส +${bonusCoins} 💰 +${bonusExp} ⭐`, 'success');
   } else {
-    const correctAnswerText = sanitizeChoiceText(currentQuiz.choices[currentQuiz.answer]);
-    ToastSystem.show(`❌ ตอบผิด! คำตอบที่ถูกต้องคือ: ${correctAnswerText}`, 'error');
+    try {
+      const correctAnswerText = sanitizeChoiceText(quiz.choices[quiz.answer]);
+      ToastSystem.show(`❌ ตอบผิด! คำตอบที่ถูกต้องคือ: ${correctAnswerText}`, 'error');
+    } catch (e) {
+      ToastSystem.show(`❌ ตอบผิดแล้ว ลองใหม่นะ!`, 'error');
+    }
   }
 
-  // เรียก Callback สรุปผล
-  if (quizCallback) {
-    const cb = quizCallback;
-    currentQuiz = null;
-    quizCallback = null;
-    cb(isCorrect, bonusCoins, bonusExp);
+  // เรียก Callback สรุปผล (ปลูกพืช / ให้อาหารสัตว์ / เก็บเกี่ยว)
+  if (cb) {
+    try {
+      cb(isCorrect, bonusCoins, bonusExp);
+    } catch (e) {
+      console.error('❌ Quiz callback error:', e);
+    }
   }
 }

@@ -43,24 +43,28 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 16px;
-  height: 52px;
-  background: linear-gradient(180deg, #8D6E63 0%, #6D4C41 40%, #4E342E 100%);
-  border-bottom: 4px solid #3E2723;
-  border-radius: 0 0 16px 16px;
-  box-shadow: 
-    0 6px 18px rgba(0, 0, 0, 0.4),
-    inset 0 2px 3px rgba(255, 255, 255, 0.3);
-  z-index: 100;
+  padding: 6px 16px;
+  min-height: 52px;
+  background: linear-gradient(180deg, #4E342E 0%, #3E2723 100%);
+  border-bottom: 3.5px solid #FFB300;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.25);
+  z-index: 1000;
   position: relative;
-  flex-wrap: nowrap;
-  gap: var(--spacing-xs);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .hud-player {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 8px;
 }
 
 .hud-avatar {
@@ -87,11 +91,10 @@ html, body {
   white-space: nowrap;
 }
 
-.hud-stats {
+.hud-stats-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
+  gap: 6px;
 }
 
 .hud-stat {
@@ -111,6 +114,13 @@ html, body {
 .hud-coins { background: linear-gradient(180deg, #FFE082 0%, #FFB300 100%); border-color: #FFF8E1; color: #5D4037; }
 .hud-exp { background: linear-gradient(180deg, #C8E6C9 0%, #66BB6A 100%); border-color: #FFF8E1; color: #1B5E20; }
 .hud-level { background: linear-gradient(180deg, #BBDEFB 0%, #42A5F5 100%); border-color: #FFF8E1; color: #0D47A1; }
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
 
 /* =========================================
    🏞️ LAYOUT หลัก: แผงตัวละครซ้าย + ฟาร์มขวา (100vh Fitted)
@@ -323,18 +333,22 @@ html, body {
   overflow: hidden;
 }
 
-/* พื้นที่ฟาร์มแบบแนวนอน Landscape Hay Day 2.5D (ขยายกว้าง 100% เต็มพื้นที่) */
+/* พื้นที่ฟาร์มแบบแนวนอน Landscape Hay Day 2.5D (ด้วย Texture หญ้า grass6.png สวยงามกลมกลืน) */
 .farm-field {
   background: 
-    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-    repeating-linear-gradient(45deg, #7CB342 0px, #7CB342 16px, #689F38 16px, #689F38 32px);
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.18) 85%),
+    url('../texture/isometric-nature-pack/grass6.png'),
+    linear-gradient(145deg, #7CB342 0%, #689F38 40%, #558B2F 100%);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-size: 100% 100%, 80px 80px, 100% 100%;
+  background-position: center, center, center;
   border-radius: 24px;
   padding: 10px 18px 12px 18px;
   box-shadow: 
-    0 12px 24px rgba(0, 0, 0, 0.35),
-    inset 0 3px 6px rgba(255, 255, 255, 0.4),
-    inset 0 -6px 0 #33691E;
-  border: 5px solid #43A047;
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    inset 0 4px 8px rgba(255, 255, 255, 0.5),
+    inset 0 -8px 0 #33691E;
+  border: 5.5px solid #43A047;
   position: relative;
   max-width: 100% !important;
   width: 100%;
@@ -378,26 +392,26 @@ html, body {
   letter-spacing: 1px;
 }
 
-/* === ตาราง 3x3 Isometric Grid === */
+/* === ตาราง 3x3 Isometric Grid (แปลงผักผืนดินกลมกลืน) === */
 .farm-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  padding: 4px;
-  transform: rotateX(16deg);
-  transform-style: preserve-3d;
+  padding: 8px;
+  background: rgba(85, 139, 47, 0.45);
+  border-radius: 20px;
+  border: 2.5px dashed rgba(255, 248, 225, 0.5);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
 }
 
 /* =========================================
-   🟫 PLOT — แปลงปลูก 3D Real Soil Texture (ขยายใหญ่ขึ้น)
+   🟫 PLOT — แปลงปลูก 3D Real Dirt Soil Texture
    ========================================= */
 .plot {
   aspect-ratio: 1.2;
-  background: 
-    repeating-linear-gradient(90deg, rgba(0,0,0,0.14) 0px, rgba(0,0,0,0.14) 6px, transparent 6px, transparent 18px),
-    linear-gradient(145deg, #795548 0%, #5D4037 50%, #3E2723 100%);
+  background: linear-gradient(145deg, #795548 0%, #5D4037 60%, #3E2723 100%);
   border-radius: 18px;
-  border: 4px solid #8D6E63;
+  border: 4px solid #A1887F;
   border-bottom: 8px solid #2C1810;
   display: flex;
   flex-direction: column;
@@ -408,8 +422,8 @@ html, body {
   position: relative;
   box-shadow: 
     0 8px 0 #2C1810,
-    0 12px 20px rgba(0, 0, 0, 0.45),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    0 12px 22px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4);
   overflow: visible;
   max-height: 108px;
   min-height: 92px;
@@ -423,8 +437,8 @@ html, body {
   transform: translateY(-8px) scale(1.04);
   box-shadow: 
     0 16px 0 #2C1810,
-    0 22px 30px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(255, 215, 0, 0.8);
+    0 22px 30px rgba(0, 0, 0, 0.55),
+    0 0 22px rgba(255, 215, 0, 0.85);
   border-color: #FFD54F;
 }
 
@@ -512,44 +526,60 @@ html, body {
   100% { transform: translate(-50%, -50px) rotate(0deg) scale(0.7); opacity: 0; }
 }
 
-/* === สถานะแปลง === */
+/* === สถานะแปลง ( Texture ดิน 3D จาก Isometric Nature Pack ) === */
 
-/* ว่าง — ดินยิ้ม 3D */
+/* ว่าง — ดินร่วนซุย 3D (dirt1.png) */
 .plot-empty {
-  background: linear-gradient(145deg, #8D6E63 0%, #6D4C41 50%, #4E342E 100%);
+  background: 
+    linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.22)),
+    url('../texture/isometric-nature-pack/dirt1.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .plot-empty::after {
   content: '➕';
   font-size: 1.6rem;
-  opacity: 0.5;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+  opacity: 0.6;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
   transition: opacity var(--transition-normal);
 }
 
 .plot-empty:hover::after {
-  opacity: 0.9;
-  transform: scale(1.2);
+  opacity: 0.95;
+  transform: scale(1.25);
 }
 
-/* ปลูกแล้ว — ต้นอ่อน 3D */
+/* ปลูกแล้ว — ดินชุ่มชื้น 3D (dirt2.png) */
 .plot-planted {
-  background: linear-gradient(145deg, #6D4C41 0%, #5D4037 100%);
+  background: 
+    linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2)),
+    url('../texture/isometric-nature-pack/dirt2.png');
+  background-size: cover;
+  background-position: center;
 }
 
-/* กำลังโต */
+/* กำลังโต — ดินบำรุงเข้มข้น 3D (dirt3.png) */
 .plot-growing {
-  background: linear-gradient(145deg, #5D4037 0%, #4E342E 100%);
+  background: 
+    linear-gradient(rgba(46,125,50,0.12), rgba(0,0,0,0.25)),
+    url('../texture/isometric-nature-pack/dirt3.png');
+  background-size: cover;
+  background-position: center;
 }
 
-/* พร้อมเก็บ — แสงสีทองเรืองรอง 3D */
+/* พร้อมเก็บ — ดินสีทองอุดมสมบูรณ์ 3D (dirt4.png + ออร่าทองเรืองรอง) */
 .plot-ready {
-  background: linear-gradient(145deg, #5D4037 0%, #3E2723 100%);
+  background: 
+    linear-gradient(rgba(255,193,7,0.25), rgba(230,81,0,0.25)),
+    url('../texture/isometric-nature-pack/dirt4.png');
+  background-size: cover;
+  background-position: center;
   animation: shimmer 1.2s ease infinite;
   border-color: #FFD700 !important;
   box-shadow: 
-    0 10px 0 #4E342E,
-    0 0 25px rgba(255, 215, 0, 0.8) !important;
+    0 10px 0 #3E2723,
+    0 0 25px rgba(255, 215, 0, 0.9) !important;
 }
 
 /* === Emoji พืชในแปลง (ยืนตรง 3D) === */
@@ -1006,20 +1036,23 @@ html, body {
 }
 
 /* =========================================
-   🐄 REAL 3D ANIMAL RANCH PASTURE (ลานคอกสัตว์ 3D มีรั้วล้อมรอบ)
+   🐄 REAL 3D ANIMAL RANCH PASTURE (ลานคอกสัตว์ 3D ด้วย Texture หญ้า grass6.png)
    ========================================= */
 .animal-ranch-pasture {
   background: 
-    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2) 0%, transparent 60%),
-    repeating-linear-gradient(45deg, #7CB342 0px, #7CB342 16px, #689F38 16px, #689F38 32px);
-  border: 4.5px solid #558B2F;
-  border-bottom: 8px solid #33691E;
+    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.18) 85%),
+    url('../texture/isometric-nature-pack/grass6.png'),
+    linear-gradient(145deg, #7CB342 0%, #689F38 40%, #558B2F 100%);
+  background-repeat: no-repeat, repeat, no-repeat;
+  background-size: 100% 100%, 80px 80px, 100% 100%;
+  border: 5px solid #558B2F;
+  border-bottom: 8.5px solid #33691E;
   border-radius: 22px;
   padding: 8px 10px;
   position: relative;
   box-shadow: 
-    0 10px 20px rgba(0,0,0,0.35),
-    inset 0 2px 4px rgba(255,255,255,0.4);
+    0 12px 24px rgba(0,0,0,0.4),
+    inset 0 3px 6px rgba(255,255,255,0.5);
   width: 100%;
   height: 100%;
   min-height: 280px;
@@ -1421,6 +1454,15 @@ html, body {
   100% { transform: translateY(0) rotate(-7deg) scale(1.1); }
 }
 
+.anim-pig-bounce {
+  animation: pigBounce 1.8s ease-in-out infinite alternate;
+}
+@keyframes pigBounce {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.08, 0.94); }
+  100% { transform: translateY(0) scale(1); }
+}
+
 /* =========================================
    🐝 BEEHIVE & TROPHY BADGE STYLES
    ========================================= */
@@ -1548,4 +1590,470 @@ html, body {
   0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
   50% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
   100% { opacity: 0; transform: translate(-50%, -45px) scale(1); }
+}
+
+/* =========================================
+   👑 REORGANIZED PREMIUM HUD & CATEGORY MENUS
+   ========================================= */
+.hud-dropdown-wrapper {
+  position: relative;
+}
+
+.hud-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: linear-gradient(180deg, #FFE082 0%, #FFB300 50%, #FF8F00 100%);
+  color: #3E2723;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 900;
+  border: 2px solid #FFF8E1;
+  border-bottom: 3.5px solid #E65100;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35), inset 0 2px 2px rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hud-cat-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  transform: rotate(25deg);
+  animation: shimmerSweep 3.5s infinite;
+}
+
+@keyframes shimmerSweep {
+  0% { left: -60%; }
+  25% { left: 140%; }
+  100% { left: 140%; }
+}
+
+.hud-cat-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 15px rgba(255, 179, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.9);
+}
+
+.hud-cat-btn:active {
+  transform: translateY(1px) scale(0.98);
+  border-bottom-width: 2px;
+}
+
+.btn-activities {
+  background: linear-gradient(180deg, #81D4FA 0%, #0288D1 60%, #01579B 100%);
+  color: #FFFFFF;
+  border-color: #E0F7FA;
+  border-bottom-color: #004D40;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.btn-edu {
+  background: linear-gradient(180deg, #D1C4E9 0%, #7B1FA2 60%, #4A148C 100%);
+  color: #FFFFFF;
+  border-color: #F3E5F5;
+  border-bottom-color: #311B92;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.btn-services {
+  background: linear-gradient(180deg, #FFE082 0%, #FFA000 60%, #E65100 100%);
+  color: #3E2723;
+  border-color: #FFF8E1;
+  border-bottom-color: #BF360C;
+}
+
+.btn-settings {
+  background: linear-gradient(180deg, #CFD8DC 0%, #607D8B 60%, #37474F 100%);
+  color: #FFFFFF;
+  border-color: #ECEFF1;
+  border-bottom-color: #263238;
+}
+
+.hud-cat-icon { font-size: 1.1rem; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+.hud-cat-arrow { font-size: 0.8rem; margin-left: 2px; transition: transform 0.2s ease; }
+.hud-cat-btn.active .hud-cat-arrow { transform: rotate(180deg); }
+
+/* 💎 GLOSSY 3D DROPDOWN POPOVER */
+.hud-dropdown-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: rgba(46, 30, 22, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2.5px solid #FFD54F;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.95);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.hud-dropdown-popover.dropdown-popover-right {
+  left: auto;
+  right: 0;
+}
+
+.hud-dropdown-popover.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.hud-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.hud-dropdown-item:hover {
+  background: linear-gradient(135deg, #FFB300 0%, #F57C00 100%);
+  border-color: #FFF8E1;
+  transform: translateX(4px);
+  box-shadow: 0 4px 10px rgba(255, 179, 0, 0.4);
+}
+
+.hud-dropdown-item:hover .item-title { color: #FFFFFF; }
+.hud-dropdown-item:hover .item-desc { color: #FFF8E1; }
+
+.item-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-title {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #FFE082;
+  transition: color 0.18s ease;
+}
+
+.item-desc {
+  font-size: 0.72rem;
+  color: #BCAAA4;
+  transition: color 0.18s ease;
+}
+
+/* SETTINGS DROPDOWN ROWS */
+.hud-dropdown-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  color: #FFF8E1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  gap: 8px;
+}
+
+.hud-dropdown-setting-row:last-child {
+  border-bottom: none;
+}
+
+.vol-control-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  padding: 2px 6px;
+  gap: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.vol-btn {
+  padding: 0;
+  font-size: 0.75rem;
+  background: #FF7043;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.vol-btn:hover { transform: scale(1.15); }
+
+@keyframes pollenFloat {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
+  50% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -45px) scale(1); }
+}
+
+/* Responsive HUD adjustments for mobile and tablets */
+@media (max-width: 992px) {
+  .hud-bar {
+    padding: 4px 8px;
+  }
+  .hud-cat-text {
+    display: none; /* Hide text on tablets/mobile, keep sleek 3D icons & arrows */
+  }
+  .hud-cat-btn {
+    padding: 5px 8px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hud-name, .hud-weather {
+    display: none;
+  }
+}
+
+/* =========================================
+   👑 ULTRA-PREMIUM 3D LARGE QUIZ MODAL STYLES
+   ========================================= */
+#quizModal .modal-content {
+  max-width: 720px !important;
+  width: 95% !important;
+  background: linear-gradient(170deg, #FFFDF5 0%, #FFF8E1 45%, #FFECB3 100%) !important;
+  border: 4px solid #FFD54F !important;
+  outline: 6px solid #4E342E !important;
+  border-radius: 28px !important;
+  padding: 24px 28px !important;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.65),
+    0 0 35px rgba(255, 215, 0, 0.4),
+    inset 0 3px 6px rgba(255, 255, 255, 0.9) !important;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Header & Badges */
+.quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.quiz-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.92rem;
+  font-weight: 900;
+  border: 2px solid #FFF8E1;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+.badge-subject {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+}
+
+.badge-grade {
+  background: linear-gradient(135deg, #42A5F5 0%, #1976D2 100%);
+  color: white;
+}
+
+.badge-topic {
+  background: linear-gradient(135deg, #AB47BC 0%, #7B1FA2 100%);
+  color: white;
+}
+
+/* Question Title Box */
+.quiz-body {
+  margin-bottom: 20px;
+}
+
+.quiz-question {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFDF5 100%);
+  border: 3px solid #FFC107;
+  border-bottom: 5.5px solid #FF8F00;
+  border-radius: 22px;
+  padding: 18px 24px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #3E2723;
+  text-align: center;
+  line-height: 1.5;
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
+  margin-bottom: 20px;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+}
+
+/* Choices Grid: 2 Columns Large Buttons */
+.quiz-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 580px) {
+  .quiz-choices {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 3D Option Buttons with Shimmer & Glow */
+.choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-height: 62px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8E1 100%);
+  border: 2.5px solid #FFE082;
+  border-bottom: 5px solid #FFA000;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 6px 14px rgba(0, 0, 0, 0.18),
+    inset 0 2px 3px rgba(255, 255, 255, 0.9);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.choice-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+  transform: rotate(25deg);
+  animation: shimmerSweep 3s infinite;
+}
+
+.choice-btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  background: linear-gradient(180deg, #FFF9C4 0%, #FFE082 50%, #FFB300 100%);
+  border-color: #FFF8E1;
+  border-bottom-color: #E65100;
+  box-shadow: 
+    0 10px 24px rgba(255, 179, 0, 0.5),
+    inset 0 3px 4px rgba(255, 255, 255, 0.9);
+}
+
+.choice-btn:active {
+  transform: translateY(2px) scale(0.98);
+  border-bottom-width: 2.5px;
+}
+
+/* 3D Letter Badge Circles (A, B, C, D) */
+.choice-letter-badge {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: white;
+  border: 2px solid #FFF8E1;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 2px 2px rgba(255,255,255,0.6);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.choice-a .choice-letter-badge { background: linear-gradient(135deg, #FF7043, #D84315); }
+.choice-b .choice-letter-badge { background: linear-gradient(135deg, #42A5F5, #1565C0); }
+.choice-c .choice-letter-badge { background: linear-gradient(135deg, #AB47BC, #6A1B9A); }
+.choice-d .choice-letter-badge { background: linear-gradient(135deg, #66BB6A, #2E7D32); }
+
+.choice-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #3E2723;
+  line-height: 1.3;
+}
+
+/* Quiz Footer & Hint */
+.quiz-footer {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+#btnQuizHint {
+  font-size: 0.95rem;
+  padding: 8px 24px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #FFE082 0%, #FFB300 100%);
+  color: #3E2723;
+  border: 2px solid #FFF8E1;
+  border-bottom: 4px solid #E65100;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.quiz-hint {
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFF9C4 100%);
+  border: 2px dashed #FBC02D;
+  border-radius: 16px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #F57F17;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  animation: fadeIn 0.3s ease;
+}
+
+/* =========================================
+   🌲 THREE.JS 3D CANVAS & OVERLAY STYLES
+   ========================================= */
+#threeFarmCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 20px;
+}
+
+.farm-dual-columns, #farmDecoBar, .farm-title {
+  position: relative;
+  z-index: 2;
 }
